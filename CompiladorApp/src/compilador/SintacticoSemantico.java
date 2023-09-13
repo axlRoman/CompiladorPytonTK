@@ -1,9 +1,9 @@
-/*:-----------------------------------------------------------------------------
+/*:--------------------------------------------------------------------------------
  *:                       INSTITUTO TECNOLOGICO DE LA LAGUNA
  *:                     INGENIERIA EN SISTEMAS COMPUTACIONALES
  *:                         LENGUAJES Y AUTOMATAS II           
  *: 
- *:                  SEMESTRE: ___________    HORA: ___________ HRS
+ *:                  SEMESTRE: AgoDic2023    HORA: __7-8__ HRS
  *:                                   
  *:               
  *:         Clase con la funcionalidad del Analizador Sintactico
@@ -20,7 +20,7 @@
  *:                 El analisis empieza invocando al metodo del simbolo inicial.
  *: Ult.Modif.    :
  *:  Fecha      Modificó            Modificacion
- *:=============================================================================
+ *:================================================================================
  *: 22/Feb/2015 FGil                -Se mejoro errorEmparejar () para mostrar el
  *:                                 numero de linea en el codigo fuente donde 
  *:                                 ocurrio el error.
@@ -28,7 +28,7 @@
  *:                                 sintactico.
  *: 20/FEB/2023 F.Gil, Oswi         -Se implementaron los procedures del parser
  *:                                  predictivo recursivo de leng BasicTec.
- *:-----------------------------------------------------------------------------
+ *:--------------------------------------------------------------------------------
  */
 package compilador;
 
@@ -37,19 +37,17 @@ import javax.swing.JOptionPane;
 public class SintacticoSemantico {
 
     private Compilador cmp;
-    private boolean    analizarSemantica = false;
-    private String     preAnalisis;
+    private boolean analizarSemantica = false;
+    private String preAnalisis;
     
     //--------------------------------------------------------------------------
     // Constructor de la clase, recibe la referencia de la clase principal del 
     // compilador.
-    //
 
     public SintacticoSemantico(Compilador c) {
         cmp = c;
     }
 
-    //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
     // Metodo que inicia la ejecucion del analisis sintactico predictivo.
     // analizarSemantica : true = realiza el analisis semantico a la par del sintactico
@@ -58,28 +56,23 @@ public class SintacticoSemantico {
     public void analizar(boolean analizarSemantica) {
         this.analizarSemantica = analizarSemantica;
         preAnalisis = cmp.be.preAnalisis.complex;
-
         // * * *   INVOCAR AQUI EL PROCEDURE DEL SIMBOLO INICIAL   * * *
         PROGRAMA();
-        
     }
 
-    //--------------------------------------------------------------------------
-
+    
     private void emparejar(String t) {
         if (cmp.be.preAnalisis.complex.equals(t)) {
             cmp.be.siguiente();
-            preAnalisis = cmp.be.preAnalisis.complex;            
+            preAnalisis = cmp.be.preAnalisis.complex;
         } else {
-            errorEmparejar( t, cmp.be.preAnalisis.lexema, cmp.be.preAnalisis.numLinea );
+            errorEmparejar(t, cmp.be.preAnalisis.lexema, cmp.be.preAnalisis.numLinea);
         }
     }
     
-    //--------------------------------------------------------------------------
+    
     // Metodo para devolver un error al emparejar
-    //--------------------------------------------------------------------------
- 
-    private void errorEmparejar(String _token, String _lexema, int numLinea ) {
+    private void errorEmparejar(String _token, String _lexema, int numLinea) {
         String msjError = "";
 
         if (_token.equals("id")) {
@@ -99,143 +92,153 @@ public class SintacticoSemantico {
         } else {
             msjError += "Se esperaba " + _token;
         }
-        msjError += " se encontró " + ( _lexema.equals ( "$" )? "fin de archivo" : _lexema ) + 
-                    ". Linea " + numLinea;        // FGil: Se agregó el numero de linea
+        msjError += " se encontró " + (_lexema.equals("$") ? "fin de archivo" : _lexema)
+                + ". Linea " + numLinea;        // FGil: Se agregó el numero de linea
 
         cmp.me.error(Compilador.ERR_SINTACTICO, msjError);
     }
-
     // Fin de ErrorEmparejar
-    //--------------------------------------------------------------------------
-    // Metodo para mostrar un error sintactico
+    
 
+    // Metodo para mostrar un error sintactico
     private void error(String _descripError) {
         cmp.me.error(cmp.ERR_SINTACTICO, _descripError);
     }
-
     // Fin de error
+    
+    
     //--------------------------------------------------------------------------
-    //  *  *   *   *    PEGAR AQUI EL CODIGO DE LOS PROCEDURES  *  *  *  *
+    //  *  *   *   *            CODIGO DE LOS PROCEDURES          *  *  *  *
     //--------------------------------------------------------------------------
 
- //Autor: Julian Rodolfo Villa Cruz
-    //PROGRAMA
-    private void PROGRAMA (){
-    if(preAnalisis.equals("def") //pro->funcion-> def
-            ||preAnalisis.equals("int")||preAnalisis.equals("float")//pro->proposicion-> esto...
-            ||preAnalisis.equals("id")||preAnalisis.equals("if")||preAnalisis.equals("while")||preAnalisis.equals("print")||preAnalisis.equals("string")){
-        INSTRUCCION();
-        PROGRAMA();
-    }else{ 
-        //Programa->vacio
+
+    //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
+    //PROGRAMA -> INSTRUCCION PROGRAMA |  ε
+    private void PROGRAMA() {
+        if (preAnalisis.equals("def") //pro->funcion-> def
+                || preAnalisis.equals("int") || preAnalisis.equals("float")//pro->proposicion-> esto...
+                || preAnalisis.equals("id") || preAnalisis.equals("if") || preAnalisis.equals("while") || preAnalisis.equals("print") || preAnalisis.equals("string")) {
+            INSTRUCCION();
+            PROGRAMA();
+        } else {
+            //ε->vacio
+        }
     }
-}
-    private void INSTRUCCION (){
-    if(preAnalisis.equals("def")){
-        FUNCION();
-    }else if(preAnalisis.equals("int")||preAnalisis.equals("float")||preAnalisis.equals("string")
-            ||preAnalisis.equals("id")||preAnalisis.equals("if")||preAnalisis.equals("while")||preAnalisis.equals("print")){
-       PROPOSICION();
-    }else{
-        error("Error en instruccion");
-    }
-   }
+
     
-    private void FUNCION (){
-    if(preAnalisis.equals("def")){
-        emparejar("def");
-        emparejar("id");
-        emparejar("(");
-        ARGUMENTOS();
-        emparejar(")");
-        emparejar(":");
-        TIPO_RETORNO();
-        PROPOSICIONES_OPTATIVAS();
-        emparejar("return");
-        RESULTADO();
-        emparejar(":");
-        emparejar(":");
-    }else{
+    //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
+    //INSTRUCCION -> FUNCION | PROPSICION
+    private void INSTRUCCION() {
+        if (preAnalisis.equals("def")) {
+            FUNCION();
+        } else if (preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")
+                || preAnalisis.equals("id") || preAnalisis.equals("if") || preAnalisis.equals("while") || preAnalisis.equals("print")) {
+            PROPOSICION();
+        } else {
+            error("Error en instruccion");
+        }
     }
-   }
-    private void DECLARACION_VARS (){
-    if(preAnalisis.equals("int")||preAnalisis.equals("float")||preAnalisis.equals("string")){
-        TIPO_DATO();
-        emparejar("id");
-        DECLARACION_VARS_P();
-    }else{
-        error("Error en 'declaracion VARS' ");
-    }
-   }
     
-    private void DECLARACION_VARS_P (){
-    if(preAnalisis.equals(",")){
-        
-        emparejar(",");
-        emparejar("id");
-        DECLARACION_VARS_P();
-    }else {
-    //a vacio
+    
+    //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
+    //FUNCION -> def id ( ARGUMENTOS ) : TIPO_RETORNO PROPOSICIONES_OPTATIVAS return RESULTADO ::
+    private void FUNCION() {
+        if (preAnalisis.equals("def")) {
+            emparejar("def");
+            emparejar("id");
+            emparejar("(");
+            ARGUMENTOS();
+            emparejar(")");
+            emparejar(":");
+            TIPO_RETORNO();
+            PROPOSICIONES_OPTATIVAS();
+            emparejar("return");
+            RESULTADO();
+            emparejar(":");
+            emparejar(":");
+        } else {
+            //ε->vacio
+        }
     }
-   }
+    
+    
+    //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
+    //DECLARACION_VARS -> TIPO_DATO id DECLARACION_VARS_P
+    private void DECLARACION_VARS() {
+        if (preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")) {
+            TIPO_DATO();
+            emparejar("id");
+            DECLARACION_VARS_P();
+        } else {
+            error("Error en 'declaracion VARS' ");
+        }
+    }
+    
+    
+    //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
+    //DECLARACION_VARS_P -> , id DECLARACION_P | ε
+    private void DECLARACION_VARS_P() {
+        if (preAnalisis.equals(",")) {
+            emparejar(",");
+            emparejar("id");
+            DECLARACION_VARS_P();
+        } else {
+            //ε->vacio
+        }
+    }
    
-    //------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------
     
-    //Autor: Francisco Axel Roman Cardoza 19130971
-    //Primeros (TIPO_RETORNO) = {void, int, float, string}
-    private void TIPO_RETORNO(){
-        if(preAnalisis.equals("void") || preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string"))
-            //TIPO_RETORNO -> void | TIPO_DATO
+    //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
+    //TIPO_RETORNO -> void | TIPO_DATO
+    private void TIPO_RETORNO() {
+        if (preAnalisis.equals("void") || preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")) //Primeros (TIPO_RETORNO) = {void, int, float, string}
+        {
             emparejar(preAnalisis);
-        else
+        } else {
             error("Error sintáctico: se esperaba 'void', 'int', 'float' o 'string'" + cmp.be.preAnalisis.getNumLinea());
+        }
     }
     
-    //------------------------------------------------------------------------------
-    
-    //Primeros (RESULTADO) = {void, literal, id, num, num.num, (, opsuma, empty, opmult, (, empty}
-    public void RESULTADO(){
+
+    //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
+    // RESULTADO -> EXPRESION | void
+    public void RESULTADO() {
+        //Primeros (RESULTADO) = {void, literal, id, num, num.num, (, opsuma, empty, opmult, (, empty}
         if (preAnalisis.equals("id") || preAnalisis.equals("num") || preAnalisis.equals("num.num") || preAnalisis.equals("literal")) {
-            // RESULTADO -> EXPRESION
             EXPRESION();
         } else if (preAnalisis.equals("void")) {
-            // RESULTADO -> void
             emparejar("void");
         } else {
             // Manejar error sintáctico o lanzar una excepción si el preAnalisis no es válido.
-            error("Error sintáctico: se esperaba 'id', 'num', 'num.num', 'literal' o 'void'"+cmp.be.preAnalisis.getNumLinea());
+            error("Error sintáctico: se esperaba 'id', 'num', 'num.num', 'literal' o 'void'" + cmp.be.preAnalisis.getNumLinea());
         }
     }
 
-    
-    //------------------------------------------------------------------------------
-    
-    //Primeros (PROPOSICIONES_OPTATIVAS) = {id, if, while, print, int, float, string, empty}
-    public void PROPOSICIONES_OPTATIVAS(){
+
+    //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
+    // PROPOSICIONES_OPTATIVAS -> PROPOSICION PROPOSICIONES_OPTATIVAS | ε
+    public void PROPOSICIONES_OPTATIVAS() {
+        //Primeros (PROPOSICIONES_OPTATIVAS) = {id, if, while, print, int, float, string, empty}
         if (preAnalisis.equals("def") || preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")
                 || preAnalisis.equals("void") || preAnalisis.equals("id") || preAnalisis.equals("if") || preAnalisis.equals("while")
                 || preAnalisis.equals("print")) {
-            // PROPOSICIONES_OPTATIVAS -> PROPOSICION PROPOSICIONES_OPTATIVAS
             PROPOSICION();
             PROPOSICIONES_OPTATIVAS();
         } else {
-            // PROPOSICIONES_OPTATIVAS -> ε
-            // No se realiza ninguna acción en este caso, ya que ε representa la producción nula.
+            //ε->vacio
         }
     }
 
-    //------------------------------------------------------------------------------
     
-    //Primeros (PROPOSICION) = {id, if, while, print, int, float, string}
+    //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
+    //PROPOSICION -> DECLARACION_VARS | id PROPOSICION_P | if CONDICION : PROPOSICIONES_OPTATIVAS else : PROPOSICIONES_OPTATIVAS :: 
+    // | while CONDICION : PROPOSICIONES_OPTATIVAS :: | print ( EXPRESION )
     public void PROPOSICION() {
-        
+        //Primeros (PROPOSICION) = {id, if, while, print, int, float, string}
         if (preAnalisis.equals("id")) {
-            // PROPOSICION -> id PROPOSICION'
             emparejar("id");
             PROPOSICION_P();
         } else if (preAnalisis.equals("if")) {
-            // PROPOSICION -> if CONDICION : PROPOSICIONES_OPTATIVAS else : PROPOSICIONES_OPTATIVAS ::
             emparejar("if");
             CONDICION();
             emparejar(":");
@@ -246,7 +249,6 @@ public class SintacticoSemantico {
             emparejar(":");
             emparejar(":");
         } else if (preAnalisis.equals("while")) {
-            // PROPOSICION -> while CONDICION : PROPOSICIONES_OPTATIVAS ::
             emparejar("while");
             CONDICION();
             emparejar(":");
@@ -254,276 +256,214 @@ public class SintacticoSemantico {
             emparejar(":");
             emparejar(":");
         } else if (preAnalisis.equals("print")) {
-            // PROPOSICION -> print ( EXPRESION )
             emparejar("print");
             emparejar("(");
             EXPRESION();
             emparejar(")");
         } else if (preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")) {
-            // PROPOSICION -> DECLARACION_VARS
             DECLARACION_VARS();
         } else {
             // Manejar error sintáctico o lanzar una excepción si el preAnalisis no es válido.
-            error("Error sintáctico: se esperaba 'id', 'if', 'while', 'print' o declaración de variables."+cmp.be.preAnalisis.getNumLinea());
+            error("Error sintáctico: se esperaba 'id', 'if', 'while', 'print' o declaración de variables." + cmp.be.preAnalisis.getNumLinea());
         }
     }
     
-    //------------------------------------------------------------------------------
     
-    //Primeros (PROPOSICION'_p) = {opasig, (}
+    //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
+    //PROPOSICION_P -> opasig EXPRESION | ( LISTA_EXPRESIONES )
     public void PROPOSICION_P() {
         if (preAnalisis.equals("opasig")) {
-            // PROPOSICION' -> opasig EXPRESION
             emparejar("opasig");
             EXPRESION();
         } else if (preAnalisis.equals("(")) {
-            // PROPOSICION' -> ( LISTA_EXPRESIONES )
             emparejar("(");
             LISTA_EXPRESIONES();
             emparejar(")");
         } else {
             // Manejar error sintáctico o lanzar una excepción si el preAnalisis no es válido.
-            error("Error sintáctico: se esperaba 'opasig' o '('"+cmp.be.preAnalisis.getNumLinea());
+            error("Error sintáctico: se esperaba 'opasig' o '('" + cmp.be.preAnalisis.getNumLinea());
         }
     }
 
-    //------------------------------------------------------------------------------
     
-    //Primeros (CONDICION) = {oprel, literal}
-    public void CONDICION(){
+    //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
+    //CONDICION -> EXPERSION oprel EXPRESION
+    public void CONDICION() {
         EXPRESION();
         emparejar("oprel");
         EXPRESION();
     }
 
-    //------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------
-    //------------------------------------------------------------------------------
-    //Autor: Braulio Esteban Gonzalez Alanis (20131498)
-    //PRIMEROS ( TIPO_DATO ) = {int, float, string }
-    
-    private void TIPO_DATO (){
-        
-        if (preAnalisis.equals("int"))
-        {
-            // TIPO_DATO -> int
+
+    //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
+    //TIPO_DATO -> int | float | string
+    private void TIPO_DATO() {
+        if (preAnalisis.equals("int")) {
             emparejar("int");
-        } 
-        else if (preAnalisis.equals("float"))
-        {
-            //TIPO_DATO -> float
+        } else if (preAnalisis.equals("float")) {
             emparejar("float");
-        } 
-        else if (preAnalisis.equals("string"))
-        {
-            //TIPO_DATO -> string
-            emparejar("string");            
-        } else 
-        {
-         error( "TIPO_DATO: Tipo de dato incorrecto, se espera (int, float, string) NO. Linea " + cmp.be.preAnalisis.getNumLinea());
+        } else if (preAnalisis.equals("string")) {
+            emparejar("string");
+        } else {
+            error("TIPO_DATO: Tipo de dato incorrecto, se espera (int, float, string) NO. Linea " + cmp.be.preAnalisis.getNumLinea());
         }
-         
     }
     
-    //--------------------------------------------------------------------------
-    //Autor: Braulio Esteban Gonzalez Alanis (20131498)
-    //PRIMEROS ( ARGUMENTOS ) = {PRIMEROS(TIPO_DATO), ϵ} 
-    private void ARGUMENTOS(){
-        if(preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")){
-            //ARGUMENTOS -> TIPO_DATO id ARGUMENTOS_P
+   
+    //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
+    //ARGUMENTOS -> TIPO_DATO id ARGUMENTOS_P | ε
+    private void ARGUMENTOS() {
+        if (preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")) {
             TIPO_DATO();
             emparejar("id");
             ARGUMENTOS_P();
-            
-        } else
-        {
-            // ARGUMENTOS -> empty
+        } else {
+            //ε->vacio
         }
-        // error( "ARGUMENTOS: Argumento no valido / se espera un id, argumentos validos (int, float, string) NO. Linea " + cmp.be.preAnalisis.getNumLinea());
-        
     }
     
-    
-    //--------------------------------------------------------------------------
-    //Autor: Braulio Esteban Gonzalez Alanis (20131498)
-    //PRIMEROS ( ARGUMENTOS_P ) = {, , ϵ }
-    
+   
+    //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
+    //ARGUEMNTOS_P -> , TIPO_DATO id ARGUEMNTOS_P | ε
     private void ARGUMENTOS_P() {
+        if (preAnalisis.equals(",")) {
+            emparejar(",");
+            TIPO_DATO();
+            emparejar("id");
+            ARGUMENTOS_P();
+        } else {
+            //ε->vacio
+        }
+    }
     
-    if(preAnalisis.equals(",")){
-        emparejar(",");
-        TIPO_DATO();
-        emparejar("id");
-        ARGUMENTOS_P();
-    } else {
-        //ARGUMENTOS_P -> ϵ
-            //error( "ARGUMENTOS: Argumento no valido / se espera un id, argumentos validos (int, float, string) / se espera una( , )   NO. Linea " + cmp.be.preAnalisis.getNumLinea());
 
-    }
-    
-        
-    
-    
-    }
-    
-       //--------------------------------------------------------------------------
-    //Autor: Braulio Esteban Gonzalez Alanis (20131498)
-    //PRIMEROS ( LISTA_EXPRESIONES) = {EXPRESION ,  ϵ }
-   // PRIMEROS(EXPRESION) = {TERMINO, literal}
-   // PRIMEROS (TERMINO)  = {FACTOR}
-   // PRIMEROS (FACTOR)   = {id, num, num.num, ( }
-    
-    private void LISTA_EXPRESIONES(){
-  
-        
-            if(preAnalisis.equals("literal") || 
-                    preAnalisis.equals("id") || 
-                    preAnalisis.equals("num")|| 
-                    preAnalisis.equals("num.num") || 
-                    preAnalisis.equals("(")){
-                
-            // LISTA_EXPRESIONES -> id
+    //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
+    //LISTA_EXPRESIONES -> EXPRESION LISTA_EXPRESIONES_P | ε
+    private void LISTA_EXPRESIONES() {
+        if (preAnalisis.equals("literal")
+                || preAnalisis.equals("id")
+                || preAnalisis.equals("num")
+                || preAnalisis.equals("num.num")
+                || preAnalisis.equals("(")) {
             EXPRESION();
             LISTA_EXPRESIONES_P();
-            
-            } else {
-            
-            }
-                
-     
-       //  error( "EXPRESION: Expresion no valida / Expresiones validas ({id, num, num.num, literal) / se espera ( , )   NO. Linea " + cmp.be.preAnalisis.getNumLinea());
-        
-    
+        } else {
+            //ε->vacio
+        }
     }
     
     
-     //--------------------------------------------------------------------------
-    //Autor: Braulio Esteban Gonzalez Alanis (20131498)
-    //PRIMEROS ( LISTA_EXPRESIONES_P) = { ,  ,  ϵ }
-    
-    private void LISTA_EXPRESIONES_P(){
-        if(preAnalisis.equals(",")){
+    //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
+    //LISTA_EXPRESIONES_P -> , EXPRESION LISTA_EXPRESIONES | ε
+    private void LISTA_EXPRESIONES_P() {
+        if (preAnalisis.equals(",")) {
             emparejar(",");
             EXPRESION();
             LISTA_EXPRESIONES_P();
-        }else {
-            //LISTA_EXPRESIONES_P -> ϵ
+        } else {
+            //ε->vacio
         }
-        
-     //   error( "EXPRESION: Expresion no valida / Expresiones validas ({id, num, num.num, literal) / se espera ( , )  NO. Linea " + cmp.be.preAnalisis.getNumLinea());
-        
-        
     }
     
     
-    //------------------------------------------------------------------------------
-    private void EXPRESION(){
-        if(preAnalisis.equals("id")
+    //Autor: Arturo Rosales Valdés - No. Control: 20130766
+    //EXPRESION -> TERMINO EXPRESION_P | literal
+    private void EXPRESION() {
+        if (preAnalisis.equals("id")
                 || preAnalisis.equals("num")
                 || preAnalisis.equals("num.num")
-                || preAnalisis.equals("(")){
+                || preAnalisis.equals("(")) {
             TERMINO();
             EXPRESION_P();
-        }else if(preAnalisis.equals("literal")){
+        } else if (preAnalisis.equals("literal")) {
             emparejar("literal");
-        }else if (preAnalisis.equals("num.num")){
-            error(""+cmp.be.preAnalisis.getNumLinea());
+        } else {
+            error("" + cmp.be.preAnalisis.getNumLinea());
         }
-         
     }
-    private void EXPRESION_P(){
-        //AUTOR: ADRIAN TORRES DE ALBA
-        //EXPREISON' -> opsuma TERMINO EXPRESION' |e
-
-        if(preAnalisis.equals("opsuma")){
-
+    
+    
+    //Autor: Arturo Rosales Valdés - No. Control: 20130766
+    //EXPRESION_P -> opsuma TERMINO EXPRESION_P | ε
+    private void EXPRESION_P() {
+        if (preAnalisis.equals("opsuma")) {
             emparejar("opsuma");
-             //TERMINO -> {id,num,num.num,(,literal}
             TERMINO();
             EXPRESION_P();
-
-        }else{
-            //e->vacio
+        } else {
+            //ε->vacio
         }
     }
-    private void TERMINO(){
-        //AUTOR: ADRIAN TORRES DE ALBA
-        //TERMINO-> FACTOR TERMINO_P
-        //FACTOR->{id,num,num.num,(,literal}
-        if(preAnalisis.equals("id")){
+    
+    
+    //Autor: Arturo Rosales Valdés - No. Control: 20130766
+    //TERMINO -> FACTOR TERMINO_P
+    private void TERMINO() {
+        if (preAnalisis.equals("id")) {
             FACTOR();
             TERMINO_P();
-
-        }else if(preAnalisis.equals("num")){
+        } else if (preAnalisis.equals("num")) {
             FACTOR();
             TERMINO_P();
-        }else if(preAnalisis.equals("num.num")){
+        } else if (preAnalisis.equals("num.num")) {
             FACTOR();
             TERMINO_P();
-        }else if(preAnalisis.equals("(")){
+        } else if (preAnalisis.equals("(")) {
             FACTOR();
             TERMINO_P();
-        }else if(preAnalisis.equals("literal")){
+        } else if (preAnalisis.equals("literal")) {
             FACTOR();
             TERMINO_P();
-        }
-        else{
-            error(""+cmp.be.preAnalisis.getNumLinea());
+        } else {
+            error("" + cmp.be.preAnalisis.getNumLinea());
         }
     }
-    private void TERMINO_P(){
-        //AUTOR: ADRIAN TORRES DE ALBA
-        //TERMINO'-> opmult FACTOR TERMINO' | e
-
-        if(preAnalisis.equals("opmult")){
-            //termino_p->opmult factor termino_p
+    
+    
+    //Autor: Arturo Rosales Valdés - No. Control: 20130766
+    //TERMINO_P -> opmult FACTOR TERMINO_P | ε
+    private void TERMINO_P() {
+        if (preAnalisis.equals("opmult")) {
             emparejar("opmult");
             FACTOR();
             TERMINO_P();
-
-        }else{
-            //e->vacio
+        } else {
+            //ε->vacio
         }
     }
-    private void FACTOR(){
-        //AUTOR: ADRIAN TORRES DE ALBA
-        //FACTOR-> id FACTOR' | num | num.num | (EXPRESION)
-
-        if(preAnalisis.equals("id")){
-
+    
+    
+    //Autor: Arturo Rosales Valdés - No. Control: 20130766
+    //FACTOR -> id FACTOR_P | num | num.num | ( EXPRESION )
+    private void FACTOR() {
+        if (preAnalisis.equals("id")) {
             emparejar("id");
             FACTOR_P();
-
-
-        }else if(preAnalisis.equals("num")){
+        } else if (preAnalisis.equals("num")) {
             emparejar("num");
-        }else if(preAnalisis.equals("num.num")){
+        } else if (preAnalisis.equals("num.num")) {
             emparejar("num.num");
-        }else if(preAnalisis.equals("(")){
+        } else if (preAnalisis.equals("(")) {
             emparejar("(");
             EXPRESION();
             emparejar(")");
-        }
-        else{
-            error(""+cmp.be.preAnalisis.getNumLinea());
+        } else {
+            error("" + cmp.be.preAnalisis.getNumLinea());
         }
     }
-    private void FACTOR_P(){
-        //AUTOR: ADRIAN TORRES DE ALBA
-        //FACTOR'-> (LISTA_EXPRESIONES) | e
-        if(preAnalisis.equals("(")){
-
+    
+    
+    //Autor: Arturo Rosales Valdés - No. Control: 20130766
+    //FACTOR_P -> ( LISTA_EXPRESIONES ) | ε
+    private void FACTOR_P() {
+        if (preAnalisis.equals("(")) {
             emparejar("(");
             LISTA_EXPRESIONES();
             emparejar(")");
-
-
-        }else{
-        //e->vacio
+        } else {
+            //ε->vacio
         }
     }
     
     
 }
-//------------------------------------------------------------------------------
-//::
