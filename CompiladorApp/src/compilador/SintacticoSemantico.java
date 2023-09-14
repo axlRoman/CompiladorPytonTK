@@ -122,6 +122,11 @@ public class SintacticoSemantico {
             PROGRAMA();
         } else {
             //ε->vacio
+            if(!preAnalisis.equals("$")){
+                error("[PROGRAMA]: Se esperaba fin del archivo."+
+                        " Se encontro: "+cmp.be.preAnalisis.lexema+
+                        "\nNo Linea: "+cmp.be.preAnalisis.getNumLinea());
+            }
         }
     }
 
