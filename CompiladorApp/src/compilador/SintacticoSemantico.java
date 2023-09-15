@@ -291,7 +291,7 @@ public class SintacticoSemantico {
             emparejar(")");
         } else {
             // Manejar error sintáctico o lanzar una excepción si el preAnalisis no es válido.
-            error("[proposicion_p]Error sintáctico: se esperaba 'opasig' o '('" + cmp.be.preAnalisis.getNumLinea());
+            error("[proposicion_p]Error sintáctico: se esperaba '=' o '('" + cmp.be.preAnalisis.getNumLinea());
         }
     }
 
