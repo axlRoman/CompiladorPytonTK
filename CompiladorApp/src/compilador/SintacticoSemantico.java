@@ -28,6 +28,12 @@
  *:                                 sintactico.
  *: 20/FEB/2023 F.Gil, Oswi         -Se implementaron los procedures del parser
  *:                                  predictivo recursivo de leng BasicTec.
+ *: 15/SEP/2023 Julian Rodolfo Villa Cruz, 
+ *:             Arturo Rosales Valdez,              -Se implementaron los procedures del parser 
+ *:             Francisco Axel Roman Cardoza,        predictivo del lenguaje PaytonTK.
+ *:             Braulio Esteban Gonzales Alanis                     
+                                     
+ULTIMA CAPTURA ACERCA DE 
  *:--------------------------------------------------------------------------------
  */
 package compilador;
@@ -130,8 +136,7 @@ public class SintacticoSemantico {
         }
     }
 
-    
-    //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
+     //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
     //INSTRUCCION -> FUNCION | PROPSICION
     private void INSTRUCCION() {
         if (preAnalisis.equals("def")) {
@@ -140,7 +145,7 @@ public class SintacticoSemantico {
                 || preAnalisis.equals("id") || preAnalisis.equals("if") || preAnalisis.equals("while") || preAnalisis.equals("print")) {
             PROPOSICION();
         } else {
-            error("Error en instruccion");
+            error("[instruccion]Error en instruccion");
         }
     }
     
@@ -175,7 +180,7 @@ public class SintacticoSemantico {
             emparejar("id");
             DECLARACION_VARS_P();
         } else {
-            error("Error en 'declaracion VARS' ");
+            error("[declaracion_vars]: Se esperaba un tipo de dato 'int', 'float', 'string'");
         }
     }
     
@@ -200,7 +205,7 @@ public class SintacticoSemantico {
         {
             emparejar(preAnalisis);
         } else {
-            error("Error sintáctico: se esperaba 'void', 'int', 'float' o 'string'" + cmp.be.preAnalisis.getNumLinea());
+            error("[tipo_retorno]Error sintáctico: se esperaba 'void', 'int', 'float' o 'string'" + cmp.be.preAnalisis.getNumLinea());
         }
     }
     
@@ -215,7 +220,7 @@ public class SintacticoSemantico {
             emparejar("void");
         } else {
             // Manejar error sintáctico o lanzar una excepción si el preAnalisis no es válido.
-            error("Error sintáctico: se esperaba 'id', 'num', 'num.num', 'literal' o 'void'" + cmp.be.preAnalisis.getNumLinea());
+            error("[resultado]Error sintáctico: se esperaba 'id', 'num', 'num.num', 'literal' o 'void'" + cmp.be.preAnalisis.getNumLinea());
         }
     }
 
@@ -269,7 +274,7 @@ public class SintacticoSemantico {
             DECLARACION_VARS();
         } else {
             // Manejar error sintáctico o lanzar una excepción si el preAnalisis no es válido.
-            error("Error sintáctico: se esperaba 'id', 'if', 'while', 'print' o declaración de variables." + cmp.be.preAnalisis.getNumLinea());
+            error("[proposicion]Error sintáctico: se esperaba 'id', 'if', 'while', 'print' o declaración de variables." + cmp.be.preAnalisis.getNumLinea());
         }
     }
     
@@ -286,7 +291,7 @@ public class SintacticoSemantico {
             emparejar(")");
         } else {
             // Manejar error sintáctico o lanzar una excepción si el preAnalisis no es válido.
-            error("Error sintáctico: se esperaba 'opasig' o '('" + cmp.be.preAnalisis.getNumLinea());
+            error("[proposicion_p]Error sintáctico: se esperaba 'opasig' o '('" + cmp.be.preAnalisis.getNumLinea());
         }
     }
 
@@ -310,7 +315,7 @@ public class SintacticoSemantico {
         } else if (preAnalisis.equals("string")) {
             emparejar("string");
         } else {
-            error("TIPO_DATO: Tipo de dato incorrecto, se espera (int, float, string) NO. Linea " + cmp.be.preAnalisis.getNumLinea());
+            error("[TIPO_DATO]: Tipo de dato incorrecto, se espera (int, float, string) NO. Linea " + cmp.be.preAnalisis.getNumLinea());
         }
     }
     
@@ -383,7 +388,7 @@ public class SintacticoSemantico {
         } else if (preAnalisis.equals("literal")) {
             emparejar("literal");
         } else {
-            error("" + cmp.be.preAnalisis.getNumLinea());
+            error("[expresion]: Se esperaba 'id', 'numero entero(num)', 'numero decimal(num.num)', '(', 'literal'" + cmp.be.preAnalisis.getNumLinea());
         }
     }
     
@@ -420,7 +425,7 @@ public class SintacticoSemantico {
             FACTOR();
             TERMINO_P();
         } else {
-            error("" + cmp.be.preAnalisis.getNumLinea());
+            error("[termino]: Se esperaba 'id', 'numero entero(num)', 'numero decimal(num.num)', '(', 'literal'" + cmp.be.preAnalisis.getNumLinea());
         }
     }
     
@@ -453,7 +458,7 @@ public class SintacticoSemantico {
             EXPRESION();
             emparejar(")");
         } else {
-            error("" + cmp.be.preAnalisis.getNumLinea());
+            error("[factor]: Se esperaba 'id', 'numero entero(num)', 'numero decimal(num.num)', '(', 'literal'" + cmp.be.preAnalisis.getNumLinea());
         }
     }
     

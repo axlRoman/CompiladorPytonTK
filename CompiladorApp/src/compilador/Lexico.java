@@ -221,7 +221,6 @@ public class Lexico {
                             "def",
                             "return",
                             "while",
-                            ",",
                             "if",
                             "else",
                             "while",
