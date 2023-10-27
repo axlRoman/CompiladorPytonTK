@@ -120,12 +120,12 @@ public class SintacticoSemantico {
 
     //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
     //PROGRAMA -> INSTRUCCION PROGRAMA |  ε
-    private void PROGRAMA() {
+    private void PROGRAMA(Atributos PROGRAMA) {
         if (preAnalisis.equals("def") //pro->funcion-> def
                 || preAnalisis.equals("int") || preAnalisis.equals("float")//pro->proposicion-> esto...
                 || preAnalisis.equals("id") || preAnalisis.equals("if") || preAnalisis.equals("while") || preAnalisis.equals("print") || preAnalisis.equals("string")) {
             INSTRUCCION();
-            PROGRAMA();
+            PROGRAMA(PROGRAMA);
         } else {
             //ε->vacio
             if(!preAnalisis.equals("$")){
@@ -138,7 +138,7 @@ public class SintacticoSemantico {
 
      //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
     //INSTRUCCION -> FUNCION | PROPSICION
-    private void INSTRUCCION() {
+    private void INSTRUCCION(Atributos INSTRUCCION) {
         if (preAnalisis.equals("def")) {
             FUNCION();
         } else if (preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")
@@ -152,7 +152,7 @@ public class SintacticoSemantico {
     
     //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
     //FUNCION -> def id ( ARGUMENTOS ) : TIPO_RETORNO PROPOSICIONES_OPTATIVAS return RESULTADO ::
-    private void FUNCION() {
+    private void FUNCION(Atributos FUNCION) {
         if (preAnalisis.equals("def")) {
             emparejar("def");
             emparejar("id");
@@ -174,7 +174,7 @@ public class SintacticoSemantico {
     
     //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
     //DECLARACION_VARS -> TIPO_DATO id DECLARACION_VARS_P
-    private void DECLARACION_VARS() {
+    private void DECLARACION_VARS(Atributos DECLARACION_VARS ) {
         if (preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")) {
             TIPO_DATO();
             emparejar("id");
@@ -187,7 +187,7 @@ public class SintacticoSemantico {
     
     //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
     //DECLARACION_VARS_P -> , id DECLARACION_P | ε
-    private void DECLARACION_VARS_P() {
+    private void DECLARACION_VARS_P(Atributos DECLARACION_VARS_P) {
         if (preAnalisis.equals(",")) {
             emparejar(",");
             emparejar("id");
@@ -200,7 +200,7 @@ public class SintacticoSemantico {
     
     //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
     //TIPO_RETORNO -> void | TIPO_DATO
-    private void TIPO_RETORNO() {
+    private void TIPO_RETORNO(Atributos TIPO_RETORNO) {
         if (preAnalisis.equals("void") || preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")) //Primeros (TIPO_RETORNO) = {void, int, float, string}
         {
             emparejar(preAnalisis);
@@ -212,7 +212,7 @@ public class SintacticoSemantico {
 
     //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
     // RESULTADO -> EXPRESION | void
-    public void RESULTADO() {
+    public void RESULTADO(Atributos RESULTADO) {
         //Primeros (RESULTADO) = {void, literal, id, num, num.num, (, opsuma, empty, opmult, (, empty}
         if (preAnalisis.equals("id") || preAnalisis.equals("num") || preAnalisis.equals("num.num") || preAnalisis.equals("literal")) {
             EXPRESION();
@@ -227,7 +227,7 @@ public class SintacticoSemantico {
 
     //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
     // PROPOSICIONES_OPTATIVAS -> PROPOSICION PROPOSICIONES_OPTATIVAS | ε
-    public void PROPOSICIONES_OPTATIVAS() {
+    public void PROPOSICIONES_OPTATIVAS(Atributos PROPOSICIONES_OPTATIVAS) {
         //Primeros (PROPOSICIONES_OPTATIVAS) = {id, if, while, print, int, float, string, empty}
         if (preAnalisis.equals("def") || preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")
                 || preAnalisis.equals("void") || preAnalisis.equals("id") || preAnalisis.equals("if") || preAnalisis.equals("while")
@@ -243,7 +243,7 @@ public class SintacticoSemantico {
     //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
     //PROPOSICION -> DECLARACION_VARS | id PROPOSICION_P | if CONDICION : PROPOSICIONES_OPTATIVAS else : PROPOSICIONES_OPTATIVAS :: 
     // | while CONDICION : PROPOSICIONES_OPTATIVAS :: | print ( EXPRESION )
-    public void PROPOSICION() {
+    public void PROPOSICION(Atributos PROPOSICION) {
         //Primeros (PROPOSICION) = {id, if, while, print, int, float, string}
         if (preAnalisis.equals("id")) {
             emparejar("id");
@@ -281,7 +281,7 @@ public class SintacticoSemantico {
     
     //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
     //PROPOSICION_P -> opasig EXPRESION | ( LISTA_EXPRESIONES )
-    public void PROPOSICION_P() {
+    public void PROPOSICION_P(Atributos PROPOSICION_P) {
         if (preAnalisis.equals("opasig")) {
             emparejar("opasig");
             EXPRESION();
@@ -298,7 +298,7 @@ public class SintacticoSemantico {
     
     //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
     //CONDICION -> EXPERSION oprel EXPRESION
-    public void CONDICION() {
+    public void CONDICION(Atributos CONDICION) {
         EXPRESION();
         emparejar("oprel");
         EXPRESION();
@@ -307,7 +307,7 @@ public class SintacticoSemantico {
 
     //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
     //TIPO_DATO -> int | float | string
-    private void TIPO_DATO() {
+    private void TIPO_DATO(Atributos TIPO_DATO) {
         if (preAnalisis.equals("int")) {
             emparejar("int");
         } else if (preAnalisis.equals("float")) {
@@ -322,7 +322,7 @@ public class SintacticoSemantico {
    
     //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
     //ARGUMENTOS -> TIPO_DATO id ARGUMENTOS_P | ε
-    private void ARGUMENTOS() {
+    private void ARGUMENTOS(Atributos ARGUMENTOS) {
         if (preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")) {
             TIPO_DATO();
             emparejar("id");
@@ -335,7 +335,7 @@ public class SintacticoSemantico {
    
     //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
     //ARGUEMNTOS_P -> , TIPO_DATO id ARGUEMNTOS_P | ε
-    private void ARGUMENTOS_P() {
+    private void ARGUMENTOS_P(Atributos ARGUMENTOS_P) {
         if (preAnalisis.equals(",")) {
             emparejar(",");
             TIPO_DATO();
@@ -349,7 +349,7 @@ public class SintacticoSemantico {
 
     //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
     //LISTA_EXPRESIONES -> EXPRESION LISTA_EXPRESIONES_P | ε
-    private void LISTA_EXPRESIONES() {
+    private void LISTA_EXPRESIONES(Atributos LISTA_EXPRESIONES) {
         if (preAnalisis.equals("literal")
                 || preAnalisis.equals("id")
                 || preAnalisis.equals("num")
@@ -365,7 +365,7 @@ public class SintacticoSemantico {
     
     //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
     //LISTA_EXPRESIONES_P -> , EXPRESION LISTA_EXPRESIONES | ε
-    private void LISTA_EXPRESIONES_P() {
+    private void LISTA_EXPRESIONES_P(Atributos LISTA_EXPRESIONES_P) {
         if (preAnalisis.equals(",")) {
             emparejar(",");
             EXPRESION();
@@ -378,7 +378,7 @@ public class SintacticoSemantico {
     
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //EXPRESION -> TERMINO EXPRESION_P | literal
-    private void EXPRESION() {
+    private void EXPRESION(Atributos EXPRESION) {
         if (preAnalisis.equals("id")
                 || preAnalisis.equals("num")
                 || preAnalisis.equals("num.num")
@@ -395,7 +395,7 @@ public class SintacticoSemantico {
     
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //EXPRESION_P -> opsuma TERMINO EXPRESION_P | ε
-    private void EXPRESION_P() {
+    private void EXPRESION_P(Atributos EXPRESION_P) {
         if (preAnalisis.equals("opsuma")) {
             emparejar("opsuma");
             TERMINO();
@@ -408,7 +408,7 @@ public class SintacticoSemantico {
     
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //TERMINO -> FACTOR TERMINO_P
-    private void TERMINO() {
+    private void TERMINO(Atributos TERMINO) {
         if (preAnalisis.equals("id")) {
             FACTOR();
             TERMINO_P();
@@ -432,7 +432,7 @@ public class SintacticoSemantico {
     
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //TERMINO_P -> opmult FACTOR TERMINO_P | ε
-    private void TERMINO_P() {
+    private void TERMINO_P(Atributos TERMINO_P) {
         if (preAnalisis.equals("opmult")) {
             emparejar("opmult");
             FACTOR();
@@ -445,7 +445,7 @@ public class SintacticoSemantico {
     
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //FACTOR -> id FACTOR_P | num | num.num | ( EXPRESION )
-    private void FACTOR() {
+    private void FACTOR(Atributos FACTOR) {
         if (preAnalisis.equals("id")) {
             emparejar("id");
             FACTOR_P();
@@ -465,7 +465,7 @@ public class SintacticoSemantico {
     
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //FACTOR_P -> ( LISTA_EXPRESIONES ) | ε
-    private void FACTOR_P() {
+    private void FACTOR_P(Atributos FACTOR_P) {
         if (preAnalisis.equals("(")) {
             emparejar("(");
             LISTA_EXPRESIONES();
