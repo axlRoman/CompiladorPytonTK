@@ -160,7 +160,7 @@ public class SintacticoSemantico {
             ARGUMENTOS();
             emparejar(")");
             emparejar(":");
-            TIPO_RETORNO();
+            TIPO_RETORNO(TIPO_RETORNO);
             PROPOSICIONES_OPTATIVAS();
             emparejar("return");
             RESULTADO();
@@ -200,7 +200,7 @@ public class SintacticoSemantico {
     
     //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
     //TIPO_RETORNO -> void | TIPO_DATO
-    private void TIPO_RETORNO() {
+    private void TIPO_RETORNO(Atributos TIPO_RETORNO) {
         if (preAnalisis.equals("void") || preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")) //Primeros (TIPO_RETORNO) = {void, int, float, string}
         {
             emparejar(preAnalisis);
