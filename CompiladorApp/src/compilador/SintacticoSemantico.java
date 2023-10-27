@@ -161,7 +161,7 @@ public class SintacticoSemantico {
             ARGUMENTOS();
             emparejar(")");
             emparejar(":");
-            TIPO_RETORNO();
+            TIPO_RETORNO(TIPO_RETORNO);
             PROPOSICIONES_OPTATIVAS();
             emparejar("return");
             RESULTADO();
