@@ -63,7 +63,8 @@ public class SintacticoSemantico {
         this.analizarSemantica = analizarSemantica;
         preAnalisis = cmp.be.preAnalisis.complex;
         // * * *   INVOCAR AQUI EL PROCEDURE DEL SIMBOLO INICIAL   * * *
-        PROGRAMA();
+        Atributos PROGRAMA = new Atributos();
+        PROGRAMA(PROGRAMA);
     }
 
     
