@@ -122,6 +122,7 @@ public class SintacticoSemantico {
     //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
     //PROGRAMA -> INSTRUCCION PROGRAMA |  ε
     private void PROGRAMA(Atributos PROGRAMA) {
+        Atributos INSTRUCCION = new Atributos();
         if (preAnalisis.equals("def") //pro->funcion-> def
                 || preAnalisis.equals("int") || preAnalisis.equals("float")//pro->proposicion-> esto...
                 || preAnalisis.equals("id") || preAnalisis.equals("if") || preAnalisis.equals("while") || preAnalisis.equals("print") || preAnalisis.equals("string")) {
