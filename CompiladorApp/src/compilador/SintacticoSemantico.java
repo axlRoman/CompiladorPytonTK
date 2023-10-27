@@ -203,9 +203,16 @@ public class SintacticoSemantico {
     //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
     //TIPO_RETORNO -> void | TIPO_DATO
     private void TIPO_RETORNO(Atributos TIPO_RETORNO) {
-        if (preAnalisis.equals("void") || preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")) //Primeros (TIPO_RETORNO) = {void, int, float, string}
+        Atributos TIPO_DATO(Atributos TIPO_RETORNO)
+        if (preAnalisis.equals("void")) //Primeros (TIPO_RETORNO) = {void, int, float, string}
         {
             emparejar(preAnalisis);
+
+            TIPO_RETORNO.tipo = VOID;
+        } else if (preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")) {
+            TIPO_DATO(TIPO_DATO)
+
+            TIPO_RETORNO.tipo = TIPO_DATO.tipo;
         } else {
             error("[tipo_retorno]Error sintáctico: se esperaba 'void', 'int', 'float' o 'string'" + cmp.be.preAnalisis.getNumLinea());
         }
@@ -216,10 +223,15 @@ public class SintacticoSemantico {
     // RESULTADO -> EXPRESION | void
     public void RESULTADO(Atributos RESULTADO) {
         //Primeros (RESULTADO) = {void, literal, id, num, num.num, (, opsuma, empty, opmult, (, empty}
+        Atributos EXPRESION =  new Atributos();
         if (preAnalisis.equals("id") || preAnalisis.equals("num") || preAnalisis.equals("num.num") || preAnalisis.equals("literal")) {
-            EXPRESION();
+            EXPRESION(EXPRESION);
+
+            RESULTADO.tipo = EXPRESION.tipo;
         } else if (preAnalisis.equals("void")) {
             emparejar("void");
+
+            RESULTADO.tipo = VOID;
         } else {
             // Manejar error sintáctico o lanzar una excepción si el preAnalisis no es válido.
             error("[resultado]Error sintáctico: se esperaba 'id', 'num', 'num.num', 'literal' o 'void'" + cmp.be.preAnalisis.getNumLinea());
@@ -231,11 +243,24 @@ public class SintacticoSemantico {
     // PROPOSICIONES_OPTATIVAS -> PROPOSICION PROPOSICIONES_OPTATIVAS | ε
     public void PROPOSICIONES_OPTATIVAS(Atributos PROPOSICIONES_OPTATIVAS) {
         //Primeros (PROPOSICIONES_OPTATIVAS) = {id, if, while, print, int, float, string, empty}
+        Atributos PROPOSICION = new Atributos ();
+        Atributos PROPOSICIONES_OPTATIVAS1 = new Atributos ();
         if (preAnalisis.equals("def") || preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")
                 || preAnalisis.equals("void") || preAnalisis.equals("id") || preAnalisis.equals("if") || preAnalisis.equals("while")
                 || preAnalisis.equals("print")) {
-            PROPOSICION();
-            PROPOSICIONES_OPTATIVAS();
+            PROPOSICION(PROPOSICION);
+            PROPOSICIONES_OPTATIVAS(PROPOSICIONES_OPTATIVAS1);
+            if ( analizarSemantica )
+            {
+                if ( PROPOSICION.tipo.equals ( VACIO ) && PROPOSICIONES_OPTATIVAS1.tipo.equals ( VACIO ) )
+                    PROPOSICIONES_OPTATIVAS.tipo = VACIO;
+                else
+                {
+                    PROPOSICIONES_OPTATIVAS.tipo = ERROR_TIPO;
+                    cmp.me.error(Compilador.ERR_SEMANTICO, 
+                        "[PROPOSICIONES OPTATIVAS]: Palabra reservada esperada");
+                }
+            }
         } else {
             //ε->vacio
         }
@@ -247,33 +272,103 @@ public class SintacticoSemantico {
     // | while CONDICION : PROPOSICIONES_OPTATIVAS :: | print ( EXPRESION )
     public void PROPOSICION(Atributos PROPOSICION) {
         //Primeros (PROPOSICION) = {id, if, while, print, int, float, string}
+        Atributos DECLARACION_VARS = new Atributos ();
+        Atributos PROPOSICION_P = new Atributos ();
+        Atributos CONDICION = new Atributos ();
+        Atributos PROPOSICIONES_OPTATIVAS1 = new Atributos ();
+        Atributos PROPOSICIONES_OPTATIVAS2 = new Atributos ();
+        Atributos CONDICION1 = new Atributos ();
+        Atributos PROPOSICIONES_OPTATIVAS3 = new Atributos ();
+        Atributos EXPRESION = new Atributos ();
+        Linea_BE id = new Linea_BE ();
         if (preAnalisis.equals("id")) {
             emparejar("id");
-            PROPOSICION_P();
+            PROPOSICION_P(PROPOSICION_P);
+
+            if ( analizarSemantica )
+            {
+                if ( cmp.ts.buscaTipo ( id.entrada ).equals ( PROPOSICION_P.tipo ) )
+                    PROPOSICION.tipo = VACIO;
+                else
+                {
+                    PROPOSICION.tipo = ERROR_TIPO;
+                    cmp.me.error(Compilador.ERR_SEMANTICO, 
+                        "[PROPOSICION]: identificador redeclarado o tipo incompatible");
+                }
+            }
         } else if (preAnalisis.equals("if")) {
             emparejar("if");
-            CONDICION();
+            CONDICION(CONDICION);
             emparejar(":");
-            PROPOSICIONES_OPTATIVAS();
+            PROPOSICIONES_OPTATIVAS(PROPOSICIONES_OPTATIVAS1);
+            if ( analizarSemantica )
+            {
+                if ( CONDICION.tipo.equals ( "boolean" ) && PROPOSICIONES_OPTATIVAS1.tipo.equals ( VACIO ) )
+                    PROPOSICION.tipoaux = VACIO;
+                else
+                {
+                    PROPOSICION.tipoaux = ERROR_TIPO;
+                    cmp.me.error(Compilador.ERR_SEMANTICO, 
+                        "[PROPOSICION]: Expresión de condición if inválida");
+                }
+            }
             emparejar("else");
             emparejar(":");
-            PROPOSICIONES_OPTATIVAS();
+            PROPOSICIONES_OPTATIVAS(PROPOSICIONES_OPTATIVAS2);
+            if ( analizarSemantica )
+            {
+            if ( PROPOSICION.tipoaux.equals ( VACIO ) && PROPOSICIONES_OPTATIVAS2.tipo.equals ( VACIO ) )
+                PROPOSICION.tipo = VACIO;
+            else
+            {
+                PROPOSICION.tipo = ERROR_TIPO;
+                cmp.me.error(Compilador.ERR_SEMANTICO, 
+                        "[PROPOSICION]: Expresión de condición else inválida");
+            }
+            }
             emparejar(":");
             emparejar(":");
         } else if (preAnalisis.equals("while")) {
             emparejar("while");
-            CONDICION();
+            CONDICION(CONDICION1);
             emparejar(":");
-            PROPOSICIONES_OPTATIVAS();
+            PROPOSICIONES_OPTATIVAS(PROPOSICIONES_OPTATIVAS3);
+
+            if ( analizarSemantica )
+            {
+                if ( CONDICION1.tipo.equals ( "boolean" ) && PROPOSICIONES_OPTATIVAS3.tipo.equals ( VACIO ) )
+                    PROPOSICION.tipo = VACIO;
+                else
+                {
+                    PROPOSICION.tipo = ERROR_TIPO;
+                    cmp.me.error(Compilador.ERR_SEMANTICO, 
+                        "[PROPOSICION]: Expresión de condición while inválida");
+                }
+            }
+
             emparejar(":");
             emparejar(":");
         } else if (preAnalisis.equals("print")) {
             emparejar("print");
             emparejar("(");
-            EXPRESION();
+            EXPRESION(EXPRESION);
             emparejar(")");
+            if ( analizarSemantica )
+            {
+                if ( EXPRESION.tipo.equals ( "int" ) || EXPRESION.tipo.equals ( "float" ) ||
+                     EXPRESION.tipo.equals ( "string" ) )
+                    PROPOSICION.tipo = VACIO;
+                else
+                {
+                    PROPOSICION.tipo = ERROR_TIPO;
+                    cmp.me.error(Compilador.ERR_SEMANTICO, 
+                        "[PROPOSICION]: Declaración de expresión inválida");
+                }
+            }
         } else if (preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")) {
-            DECLARACION_VARS();
+            DECLARACION_VARS(DECLARACION_VARS);
+
+            PROPOSICION.tipo = DECLARACION_VARS.tipo;
         } else {
             // Manejar error sintáctico o lanzar una excepción si el preAnalisis no es válido.
             error("[proposicion]Error sintáctico: se esperaba 'id', 'if', 'while', 'print' o declaración de variables." + cmp.be.preAnalisis.getNumLinea());
@@ -284,13 +379,44 @@ public class SintacticoSemantico {
     //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
     //PROPOSICION_P -> opasig EXPRESION | ( LISTA_EXPRESIONES )
     public void PROPOSICION_P(Atributos PROPOSICION_P) {
+        Atributos EXPRESION = new Atributos ();
+        Atributos LISTA_EXPRESIONES = new Atributos ();
+        Atributos FACTOR_P = new Atributos ();
         if (preAnalisis.equals("opasig")) {
             emparejar("opasig");
-            EXPRESION();
+            EXPRESION(EXPRESION);
+            PROPOSICION_P.tipo = EXPRESION.tipo;
         } else if (preAnalisis.equals("(")) {
             emparejar("(");
-            LISTA_EXPRESIONES();
+            LISTA_EXPRESIONES(LISTA_EXPRESIONES);
             emparejar(")");
+            if( analizarSemantica )
+            {
+                String tipoid = cmp.ts.buscaTipo ( Integer.parseInt ( FACTOR_P.her ) );
+                if ( tipoid.contains ( "->" ) )
+                {
+                    int indice = tipoid.indexOf ( "->" );
+                    String aux = tipoid.substring ( indice );
+                    if ( esCompatible ( aux, LISTA_EXPRESIONES.tipo ))
+                       PROPOSICION_P.tipo = LISTA_EXPRESIONES.tipo;
+                    else
+                    {
+                       PROPOSICION_P.tipo = ERROR_TIPO;
+                       cmp.me.error(Compilador.ERR_SEMANTICO,
+                               "[PROPOSICION']: Expresión inválida");
+                    }
+                }
+                else if ( tipoid.equals ( "int"    ) && LISTA_EXPRESIONES.tipo.equals ( VACIO ) || 
+                          tipoid.equals ( "float"  ) && LISTA_EXPRESIONES.tipo.equals ( VACIO ) || 
+                          tipoid.equals ( "string" ) && LISTA_EXPRESIONES.tipo.equals ( VACIO ) )
+                    PROPOSICION_P.tipo = tipoid;
+                else
+                {
+                    PROPOSICION_P.tipo = ERROR_TIPO;
+                    cmp.me.error(Compilador.ERR_SEMANTICO, 
+                            "[PROPOSICION']: Expresión de tipo de dato inválida");
+                }
+                }
         } else {
             // Manejar error sintáctico o lanzar una excepción si el preAnalisis no es válido.
             error("[proposicion_p]Error sintáctico: se esperaba '=' o '('" + cmp.be.preAnalisis.getNumLinea());
@@ -301,9 +427,24 @@ public class SintacticoSemantico {
     //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
     //CONDICION -> EXPERSION oprel EXPRESION
     public void CONDICION(Atributos CONDICION) {
-        EXPRESION();
+        Atributos EXPRESION = new Atributos ();
+        Atributos EXPRESION1 = new Atributos ();
+        EXPRESION(EXPRESION);
         emparejar("oprel");
-        EXPRESION();
+        EXPRESION(EXPRESION1);
+        if ( analizarSemantica )
+            {
+                if ( ( EXPRESION.tipo.equals ( "int"   ) && EXPRESION1.tipo.equals ( "float" ) ) ||
+                     ( EXPRESION.tipo.equals ( "float" ) && EXPRESION1.tipo.equals ( "int"   ) ) ||
+                     ( EXPRESION.tipo.equals ( EXPRESION1.tipo ) ) )
+                    CONDICION.tipo = "boolean";
+                else
+                {
+                    CONDICION.tipo = ERROR_TIPO;
+                    cmp.me.error(Compilador.ERR_SEMANTICO, 
+                        "[CONDICION]: Tipos incompatibles en la comparación");
+                }
+            }
     }
 
 
