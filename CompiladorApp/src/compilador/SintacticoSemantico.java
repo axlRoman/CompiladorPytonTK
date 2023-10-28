@@ -38,6 +38,7 @@ ULTIMA CAPTURA ACERCA DE
  */
 package compilador;
 
+import general.Linea_BE;
 import javax.swing.JOptionPane;
 
 public class SintacticoSemantico {
@@ -307,13 +308,22 @@ public class SintacticoSemantico {
 
     //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
     //TIPO_DATO -> int | float | string
-    private void TIPO_DATO() {
+    private void TIPO_DATO(Atributos TIPO_DATO) {
         if (preAnalisis.equals("int")) {
             emparejar("int");
+            // ACCION SEMANTICA
+            TIPO_DATO.tipo = "int";
+            //FIN ACCION SEMANTICA
         } else if (preAnalisis.equals("float")) {
             emparejar("float");
+            //ACCION SEMANTICA
+            TIPO_DATO.tipo = "float";
+            //FIN ACCION SEMANTICA
         } else if (preAnalisis.equals("string")) {
             emparejar("string");
+            //ACCION SEMANTICA
+            TIPO_DATO.tipo = "string";
+            //FIN ACCION SEMANTICA
         } else {
             error("[TIPO_DATO]: Tipo de dato incorrecto, se espera (int, float, string) NO. Linea " + cmp.be.preAnalisis.getNumLinea());
         }
@@ -322,56 +332,194 @@ public class SintacticoSemantico {
    
     //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
     //ARGUMENTOS -> TIPO_DATO id ARGUMENTOS_P | ε
-    private void ARGUMENTOS() {
+    private void ARGUMENTOS(Atributos ARGUMENTOS) {
+        
+        Atributos TIPO_DATO = new Atributos ();
+        Atributos ARGUMENTOS_P = new Atributos ();
+        Linea_BE id = new Linea_BE ();
+        
         if (preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")) {
-            TIPO_DATO();
+            
+            TIPO_DATO( TIPO_DATO);
+            id = cmp.be.preAnalisis;
+            
             emparejar("id");
-            ARGUMENTOS_P();
+            
+            //ACCION SEMANTICA
+            
+             if ( analizarSemantica ) 
+            {
+                if ( cmp.ts.buscaTipo ( id.entrada ).equals ( NIL ) )
+                {
+                    cmp.ts.anadeTipo( id.entrada, TIPO_DATO.tipo );
+                    ARGUMENTOS.tipo = VACIO;
+                }
+                else
+                {
+                    ARGUMENTOS.tipo = ERROR_TIPO;
+                    cmp.me.error(Compilador.ERR_SEMANTICO, 
+                        "[ARGUMENTOS]: Identificador redeclarado o tipo de dato incompatible");
+                }
+            }
+             //FIN ACCION SEMANTICA
+            
+            
+            
+            
+            ARGUMENTOS_P(ARGUMENTOS_P);
+            
+            if ( analizarSemantica )
+            {
+                if ( ARGUMENTOS.tipo.equals ( VACIO ) && ARGUMENTOS_P.tipo.equals ( VACIO ) )
+                {
+                    ARGUMENTOS.tipo = VACIO;
+                    ARGUMENTOS.her = TIPO_DATO.tipo + " X " + ARGUMENTOS_P.her;
+                }
+                else
+                {
+                    ARGUMENTOS.tipo = ERROR_TIPO;
+                    cmp.me.error(Compilador.ERR_SEMANTICO, 
+                        "[ARGUMENTOS]: Argumento no valido");
+                }
+            }
+            // FIN ACCIÓN SEMÁNTICA 4.2
+            
+            
+            
+            
         } else {
             //ε->vacio
+            ARGUMENTOS.tipo = VACIO;
         }
     }
     
    
     //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
     //ARGUEMNTOS_P -> , TIPO_DATO id ARGUEMNTOS_P | ε
-    private void ARGUMENTOS_P() {
+    private void ARGUMENTOS_P(Atributos ARGUMENTOS_P) {
+        
+        Atributos TIPO_DATO = new Atributos ();
+        Atributos ARGUMENTOS_P1 = new Atributos ();
+        Atributos ARGUMENTOS = new Atributos ();
+        Linea_BE id = new Linea_BE ();
+        
+        
         if (preAnalisis.equals(",")) {
             emparejar(",");
-            TIPO_DATO();
+            TIPO_DATO(TIPO_DATO);
+                               id = cmp.be.preAnalisis;
             emparejar("id");
-            ARGUMENTOS_P();
+            
+                                // ACCIÓN SEMÁNTICA 5.1
+                if ( analizarSemantica )
+                {
+                    if ( cmp.ts.buscaTipo ( id.entrada ).equals ( NIL ) )
+                    {
+                        cmp.ts.anadeTipo ( id.entrada, TIPO_DATO.tipo );
+                        ARGUMENTOS_P.tipo = VACIO;
+                    }
+                    else
+                    {
+                        ARGUMENTOS_P.tipo = ERROR_TIPO;
+                        cmp.me.error(Compilador.ERR_SEMANTICO, 
+                        "[ARGUMENTOS']: Identificador redeclarado o tipo de dato incompatible");
+                    }
+                }
+                // FIN ACCIÓN SEMÁNTICA 5.1 
+                  
+            ARGUMENTOS_P( ARGUMENTOS_P1);
+            
+                     // ACCIÓN SEMÁNTICA 5.2
+                if ( analizarSemantica )
+                {
+                    if ( ARGUMENTOS_P.tipo.equals ( VACIO ) && ARGUMENTOS_P1.tipo.equals ( VACIO ) )
+                    {
+                        ARGUMENTOS_P.her = TIPO_DATO.tipo + " X " + ARGUMENTOS_P1.her;
+                        ARGUMENTOS_P.tipo = VACIO;
+                    }
+                    else
+                    {
+                        ARGUMENTOS_P.tipo = ERROR_TIPO;
+                        cmp.me.error(Compilador.ERR_SEMANTICO, 
+                        "[ARGUMENTOS']: Argumento no valido");
+                    }
+                }
+                // FIN ACCIÓN SEMÁNTICA 5.2
+                       
         } else {
             //ε->vacio
+            ARGUMENTOS_P.tipo = VACIO;
+
         }
     }
     
 
     //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
     //LISTA_EXPRESIONES -> EXPRESION LISTA_EXPRESIONES_P | ε
-    private void LISTA_EXPRESIONES() {
+    private void LISTA_EXPRESIONES(Atributos LISTA_EXPRESIONES) {
+         Atributos EXPRESION = new Atributos ();
+        Atributos LISTA_EXPRESIONES_P = new Atributos ();
+        
         if (preAnalisis.equals("literal")
                 || preAnalisis.equals("id")
                 || preAnalisis.equals("num")
                 || preAnalisis.equals("num.num")
                 || preAnalisis.equals("(")) {
-            EXPRESION();
-            LISTA_EXPRESIONES_P();
+            
+ // LISTA_EXPRESIONES -> EXPRESION  LISTA_EXPRESIONES'
+            EXPRESION(EXPRESION);
+            LISTA_EXPRESIONES_P(LISTA_EXPRESIONES_P);
+          
+            // ACCIÓN SEMANTICA 
+            if ( analizarSemantica )
+            {
+                if ( EXPRESION.tipo != ERROR_TIPO && LISTA_EXPRESIONES_P.tipo != ERROR_TIPO )
+                    LISTA_EXPRESIONES.tipo = EXPRESION.tipo + "X" + LISTA_EXPRESIONES_P.tipo;
+                else
+                {
+                    LISTA_EXPRESIONES.tipo = ERROR_TIPO;
+                    cmp.me.error(Compilador.ERR_SEMANTICO, 
+                        "[LISTA_EXPRESIONES]: Declaración de expresión inválida");
+                }
+            }
+            // FIN ACCIÓN SEMÁNTICA         
         } else {
             //ε->vacio
+            LISTA_EXPRESIONES.tipo = VACIO;
         }
     }
     
     
     //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
     //LISTA_EXPRESIONES_P -> , EXPRESION LISTA_EXPRESIONES | ε
-    private void LISTA_EXPRESIONES_P() {
+    private void LISTA_EXPRESIONES_P(Atributos LISTA_EXPRESIONES_P) {
+        
+        Atributos EXPRESION = new Atributos ();
+        Atributos LISTA_EXPRESIONES_P1 = new Atributos ();
+        
         if (preAnalisis.equals(",")) {
+            
             emparejar(",");
-            EXPRESION();
-            LISTA_EXPRESIONES_P();
+              EXPRESION( EXPRESION);
+            LISTA_EXPRESIONES_P(LISTA_EXPRESIONES_P1);
+            
+              // ACCIÓN SEMÁNTICA 
+                if ( analizarSemantica )
+                {
+                    if ( EXPRESION.tipo != ERROR_TIPO && LISTA_EXPRESIONES_P1.tipo != ERROR_TIPO )
+                        LISTA_EXPRESIONES_P.tipo = EXPRESION.tipo + "X" + LISTA_EXPRESIONES_P1.tipo;
+                    else
+                    {
+                        LISTA_EXPRESIONES_P.tipo = ERROR_TIPO;
+                        cmp.me.error(Compilador.ERR_SEMANTICO, 
+                        "[LISTA DE EXPRESIONES] Declaración de expresiones inválida");
+                    }
+                }
+                // FIN ACCIÓN SEMÁNTICA 
+            
         } else {
             //ε->vacio
+            LISTA_EXPRESIONES_P.tipo = VACIO;
         }
     }
     

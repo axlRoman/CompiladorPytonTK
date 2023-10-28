@@ -2,6 +2,8 @@ package principal;
 
 import gui.CompiladorFrame;
 import compilador.Compilador;
+import general.Linea_BE;
+import general.Linea_TS;
 
 public class Main {
     
