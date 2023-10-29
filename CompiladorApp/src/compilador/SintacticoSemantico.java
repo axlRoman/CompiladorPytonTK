@@ -311,19 +311,19 @@ public class SintacticoSemantico {
     private void TIPO_DATO(Atributos TIPO_DATO) {
         if (preAnalisis.equals("int")) {
             emparejar("int");
-            // ACCION SEMANTICA
+            // ACCION SEMANTICA {9}
             TIPO_DATO.tipo = "int";
-            //FIN ACCION SEMANTICA
+            //FIN ACCION SEMANTICA {9}
         } else if (preAnalisis.equals("float")) {
             emparejar("float");
-            //ACCION SEMANTICA
+            //ACCION SEMANTICA {10}
             TIPO_DATO.tipo = "float";
-            //FIN ACCION SEMANTICA
+            //FIN ACCION SEMANTICA {10}
         } else if (preAnalisis.equals("string")) {
             emparejar("string");
-            //ACCION SEMANTICA
+            //ACCION SEMANTICA   {11}
             TIPO_DATO.tipo = "string";
-            //FIN ACCION SEMANTICA
+            //FIN ACCION SEMANTICA  {11}
         } else {
             error("[TIPO_DATO]: Tipo de dato incorrecto, se espera (int, float, string) NO. Linea " + cmp.be.preAnalisis.getNumLinea());
         }
@@ -345,7 +345,7 @@ public class SintacticoSemantico {
             
             emparejar("id");
             
-            //ACCION SEMANTICA
+            //ACCION SEMANTICA {30}
             
              if ( analizarSemantica ) 
             {
@@ -361,13 +361,14 @@ public class SintacticoSemantico {
                         "[ARGUMENTOS]: Identificador redeclarado o tipo de dato incompatible");
                 }
             }
-             //FIN ACCION SEMANTICA
+             //FIN ACCION SEMANTICA {30}
             
             
             
             
             ARGUMENTOS_P(ARGUMENTOS_P);
             
+            //INICIO ACCION SEMANTICA {30.1}
             if ( analizarSemantica )
             {
                 if ( ARGUMENTOS.tipo.equals ( VACIO ) && ARGUMENTOS_P.tipo.equals ( VACIO ) )
@@ -382,14 +383,16 @@ public class SintacticoSemantico {
                         "[ARGUMENTOS]: Argumento no valido");
                 }
             }
-            // FIN ACCIÓN SEMÁNTICA 4.2
+            // FIN ACCIÓN SEMÁNTICA {30.1}
             
             
             
             
         } else {
             //ε->vacio
+            //INICIO ACCION SEMANTICA {31}
             ARGUMENTOS.tipo = VACIO;
+            //FIN ACCION SEMANTICA {31}
         }
     }
     
@@ -410,7 +413,7 @@ public class SintacticoSemantico {
                                id = cmp.be.preAnalisis;
             emparejar("id");
             
-                                // ACCIÓN SEMÁNTICA 5.1
+                                // ACCIÓN SEMÁNTICA {32}
                 if ( analizarSemantica )
                 {
                     if ( cmp.ts.buscaTipo ( id.entrada ).equals ( NIL ) )
@@ -425,11 +428,11 @@ public class SintacticoSemantico {
                         "[ARGUMENTOS']: Identificador redeclarado o tipo de dato incompatible");
                     }
                 }
-                // FIN ACCIÓN SEMÁNTICA 5.1 
+                // FIN ACCIÓN SEMÁNTICA {32}
                   
             ARGUMENTOS_P( ARGUMENTOS_P1);
             
-                     // ACCIÓN SEMÁNTICA 5.2
+                     // ACCIÓN SEMÁNTICA {32.1}
                 if ( analizarSemantica )
                 {
                     if ( ARGUMENTOS_P.tipo.equals ( VACIO ) && ARGUMENTOS_P1.tipo.equals ( VACIO ) )
@@ -444,12 +447,13 @@ public class SintacticoSemantico {
                         "[ARGUMENTOS']: Argumento no valido");
                     }
                 }
-                // FIN ACCIÓN SEMÁNTICA 5.2
+                // FIN ACCIÓN SEMÁNTICA {32.1}
                        
         } else {
             //ε->vacio
+            //INICIO ACCION SEMANTICA {33}
             ARGUMENTOS_P.tipo = VACIO;
-
+            //FIN ACCION SEMANTICA  {33}
         }
     }
     
@@ -470,7 +474,7 @@ public class SintacticoSemantico {
             EXPRESION(EXPRESION);
             LISTA_EXPRESIONES_P(LISTA_EXPRESIONES_P);
           
-            // ACCIÓN SEMANTICA 
+            // ACCIÓN SEMANTICA {34}
             if ( analizarSemantica )
             {
                 if ( EXPRESION.tipo != ERROR_TIPO && LISTA_EXPRESIONES_P.tipo != ERROR_TIPO )
@@ -482,10 +486,12 @@ public class SintacticoSemantico {
                         "[LISTA_EXPRESIONES]: Declaración de expresión inválida");
                 }
             }
-            // FIN ACCIÓN SEMÁNTICA         
+            // FIN ACCIÓN SEMÁNTICA {34}        
         } else {
             //ε->vacio
+            //INCIO ACCION SEMANTICA {35}
             LISTA_EXPRESIONES.tipo = VACIO;
+            //FIN ACCION SEMANTICA {35}
         }
     }
     
@@ -503,7 +509,7 @@ public class SintacticoSemantico {
               EXPRESION( EXPRESION);
             LISTA_EXPRESIONES_P(LISTA_EXPRESIONES_P1);
             
-              // ACCIÓN SEMÁNTICA 
+              // ACCIÓN SEMÁNTICA  {36}
                 if ( analizarSemantica )
                 {
                     if ( EXPRESION.tipo != ERROR_TIPO && LISTA_EXPRESIONES_P1.tipo != ERROR_TIPO )
@@ -515,11 +521,13 @@ public class SintacticoSemantico {
                         "[LISTA DE EXPRESIONES] Declaración de expresiones inválida");
                     }
                 }
-                // FIN ACCIÓN SEMÁNTICA 
+                // FIN ACCIÓN SEMÁNTICA {36}
             
         } else {
             //ε->vacio
+            //INICIO ACCION SEMANTICA {37}
             LISTA_EXPRESIONES_P.tipo = VACIO;
+            //FIN ACCION SEMANTICA {37}
         }
     }
     
