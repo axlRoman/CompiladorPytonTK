@@ -38,9 +38,14 @@ ULTIMA CAPTURA ACERCA DE
  */
 package compilador;
 
+import general.Linea_BE;
 import javax.swing.JOptionPane;
 
 public class SintacticoSemantico {
+    
+    //Declaracion de constantes
+    public static final String VACIO = "Vacio";
+    public static final String ERROR_TIPO = "Error_Tipo";
 
     public static final String VACIO = "Vacio";
     public static final String ERROR_TIPO = "Error_Tipo";
@@ -816,14 +821,42 @@ public class SintacticoSemantico {
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //EXPRESION -> TERMINO EXPRESION_P | literal
     private void EXPRESION(Atributos EXPRESION) {
-        if (preAnalisis.equals("id")
-                || preAnalisis.equals("num")
-                || preAnalisis.equals("num.num")
-                || preAnalisis.equals("(")) {
-            TERMINO();
-            EXPRESION_P();
-        } else if (preAnalisis.equals("literal")) {
+        Atributos TERMINO = new Atributos();
+        Atributos EXPRESION_P = new Atributos();
+        Linea_BE literal = new Linea_BE();
+        if (cmp.be.preAnalisis.complex.equals("id")
+                || cmp.be.preAnalisis.complex.equals("num")
+                || cmp.be.preAnalisis.complex.equals("num.num")
+                || cmp.be.preAnalisis.complex.equals("(")) {
+            TERMINO(TERMINO);
+            EXPRESION_P(EXPRESION_P);
+           
+        //Inicia accion semantica 24
+        if(analizarSemantica){
+            if(TERMINO.tipo.equals(ERROR_TIPO))
+                EXPRESION.tipo = ERROR_TIPO;
+            else if(EXPRESION_P.tipo.equals(VACIO))
+                EXPRESION.tipo = TERMINO.tipo;
+            else if(TERMINO.tipo.equals("literal") && !EXPRESION_P.tipo.equals("literal") || 
+                    !TERMINO.tipo.equals("literal") && EXPRESION_P.tipo.equals("literal"))
+                EXPRESION.tipo = ERROR_TIPO;
+            else if(TERMINO.tipo.equals("literal") && EXPRESION_P.tipo.equals("literal"))
+                EXPRESION.tipo = "literal";
+            else if(TERMINO.tipo.equals("num.num") || EXPRESION_P.tipo.equals("num.num"))
+                EXPRESION.tipo = "num.num";
+            else 
+                EXPRESION.tipo = "num";
+        }
+            //FINALIZA ACCION SEMANTICA 24
+            
+        } else if (cmp.be.preAnalisis.complex.equals("literal")) {
             emparejar("literal");
+            
+            //Inicia accion semantica 25
+            if(analizarSemantica){
+                EXPRESION.tipo = "literal";
+            }
+                            
         } else {
             error("[expresion]: Se esperaba 'id', 'numero entero(num)', 'numero decimal(num.num)', '(', 'literal'" + cmp.be.preAnalisis.getNumLinea());
         }
@@ -833,11 +866,39 @@ public class SintacticoSemantico {
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //EXPRESION_P -> opsuma TERMINO EXPRESION_P | ε
     private void EXPRESION_P(Atributos EXPRESION_P) {
-        if (preAnalisis.equals("opsuma")) {
+        Atributos TERMINO = new Atributos();
+        Atributos EXPRESION_P1 = new Atributos();
+                
+        if (cmp.be.preAnalisis.complex.equals("opsuma")) {
             emparejar("opsuma");
-            TERMINO();
-            EXPRESION_P();
+            TERMINO(TERMINO);
+            EXPRESION_P(EXPRESION_P1);
+            
+        //Inicia la accion semantica 26
+            if(analizarSemantica){
+            if(TERMINO.tipo.equals(ERROR_TIPO))
+                EXPRESION_P.tipo = ERROR_TIPO;
+            else if(EXPRESION_P1.tipo.equals(VACIO))
+                EXPRESION_P.tipo = TERMINO.tipo;
+            else if(TERMINO.tipo.equals("literal") && !EXPRESION_P1.tipo.equals("literal") || 
+                    !TERMINO.tipo.equals("literal") && EXPRESION_P1.tipo.equals("literal"))
+                EXPRESION_P.tipo = ERROR_TIPO;
+            else if(TERMINO.tipo.equals("literal") && EXPRESION_P1.tipo.equals("literal"))
+                EXPRESION_P.tipo = "literal";
+            else if(TERMINO.tipo.equals("num.num") || EXPRESION_P1.tipo.equals("num.num"))
+                EXPRESION_P.tipo = "num.num";
+            else 
+                EXPRESION_P.tipo = "num";
+        }
+        //Finaliza la accion semantica 26
+        
         } else {
+            
+            //Inicia accion semantica #?????????????????????????????
+            if(analizarSemantica){
+                EXPRESION_P.tipo = VACIO;
+            }
+            //Finaliza la accion semantica #?????????????????????????????
             //ε->vacio
         }
     }
@@ -846,35 +907,83 @@ public class SintacticoSemantico {
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //TERMINO -> FACTOR TERMINO_P
     private void TERMINO(Atributos TERMINO) {
-        if (preAnalisis.equals("id")) {
-            FACTOR();
-            TERMINO_P();
-        } else if (preAnalisis.equals("num")) {
-            FACTOR();
-            TERMINO_P();
-        } else if (preAnalisis.equals("num.num")) {
-            FACTOR();
-            TERMINO_P();
-        } else if (preAnalisis.equals("(")) {
-            FACTOR();
-            TERMINO_P();
-        } else if (preAnalisis.equals("literal")) {
-            FACTOR();
-            TERMINO_P();
+        Atributos FACTOR = new Atributos();
+        Atributos TERMINO_P = new Atributos();
+        
+        if (cmp.be.preAnalisis.complex.equals("id")) {
+            FACTOR(FACTOR);
+            TERMINO_P(TERMINO_P);
+        } else if (cmp.be.preAnalisis.complex.equals("num")) {
+            FACTOR(FACTOR);
+            TERMINO_P(TERMINO_P);
+        } else if (cmp.be.preAnalisis.complex.equals("num.num")) {
+            FACTOR(FACTOR);
+            TERMINO_P(TERMINO_P);
+        } else if (cmp.be.preAnalisis.complex.equals("(")) {
+            FACTOR(FACTOR);
+            TERMINO_P(TERMINO_P);
+        } else if (cmp.be.preAnalisis.complex.equals("literal")) {
+            FACTOR(FACTOR);
+            TERMINO_P(TERMINO_P);
+            
+                    
+        //Inicia accion semantica 38
+        if(analizarSemantica){
+            if(FACTOR.tipo.equals(ERROR_TIPO) || TERMINO_P.tipo.equals(ERROR_TIPO))
+                TERMINO.tipo = ERROR_TIPO;
+            else if(TERMINO_P.tipo.equals(VACIO))
+                TERMINO.tipo = FACTOR.tipo;
+            else if(FACTOR.tipo.equals("literal"))
+                TERMINO.tipo = ERROR_TIPO;
+            else if(FACTOR.tipo.equals("num.num")||TERMINO_P.tipo.equals("num.num"))
+                TERMINO.tipo = "num.num";
+            else 
+                TERMINO.tipo = "num";
+        }
+        //Finaliza accion semantica 38
+            
+            
+            
         } else {
             error("[termino]: Se esperaba 'id', 'numero entero(num)', 'numero decimal(num.num)', '(', 'literal'" + cmp.be.preAnalisis.getNumLinea());
         }
+         
     }
     
     
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //TERMINO_P -> opmult FACTOR TERMINO_P | ε
     private void TERMINO_P(Atributos TERMINO_P) {
-        if (preAnalisis.equals("opmult")) {
+        Atributos FACTOR = new Atributos();
+        Atributos TERMINO_P1 = new Atributos();
+        
+        if (cmp.be.preAnalisis.complex.equals("opmult")) {
             emparejar("opmult");
-            FACTOR();
-            TERMINO_P();
+            FACTOR(FACTOR);
+            TERMINO_P(TERMINO_P1);
+            
+        //Inicia accion semantica 39
+         if(analizarSemantica){
+            if(FACTOR.tipo.equals(ERROR_TIPO) || TERMINO_P1.tipo.equals(ERROR_TIPO))
+                TERMINO_P.tipo = ERROR_TIPO;
+            else if(TERMINO_P1.tipo.equals(VACIO))
+                TERMINO_P.tipo = FACTOR.tipo;
+            else if(FACTOR.tipo.equals("literal"))
+                TERMINO_P.tipo = ERROR_TIPO;
+            else if(FACTOR.tipo.equals("num.num")||TERMINO_P1.tipo.equals("num.num"))
+                TERMINO_P.tipo = "num.num";
+            else 
+                TERMINO_P.tipo = "num";
+        }
+        //Finaliza accion semantica 39
+            
         } else {
+            
+            //Inicia accion semantica #2????
+            if(analizarSemantica){
+                TERMINO_P.tipo = VACIO;
+            }
+            //Finaliza accion semantica #2????
             //ε->vacio
         }
     }
@@ -883,17 +992,51 @@ public class SintacticoSemantico {
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //FACTOR -> id FACTOR_P | num | num.num | ( EXPRESION )
     private void FACTOR(Atributos FACTOR) {
-        if (preAnalisis.equals("id")) {
+        Atributos FACTOR_P = new Atributos();
+        Atributos EXPRESION = new Atributos();
+        Linea_BE id = new Linea_BE();
+        Linea_BE num_num = new Linea_BE();
+        Linea_BE num = new Linea_BE();
+                
+        if (cmp.ts.buscaTipo(id.entrada).equals(FACTOR_P.tipo)) {
             emparejar("id");
-            FACTOR_P();
-        } else if (preAnalisis.equals("num")) {
+            FACTOR_P(FACTOR_P);
+            
+            //Inicia accion semantica 40
+            if(analizarSemantica){
+                if(FACTOR_P.tipo.equals(VACIO))
+                    FACTOR.tipo = cmp.ts.buscaTipo(id.entrada);
+                else if(cmp.ts.buscaTipo(id.entrada).equals(FACTOR_P.tipo))
+                    FACTOR.tipo = FACTOR_P.tipo;
+                else
+                    FACTOR.tipo = ERROR_TIPO;
+            }
+            
+        } else if (cmp.be.preAnalisis.complex.equals("num")) {
             emparejar("num");
-        } else if (preAnalisis.equals("num.num")) {
+            
+            //Inicio accion semantica 41
+            if(analizarSemantica){
+                FACTOR.tipo = cmp.ts.buscaTipo(num.entrada);
+            }
+            
+        } else if (cmp.be.preAnalisis.complex.equals("num.num")) {
             emparejar("num.num");
-        } else if (preAnalisis.equals("(")) {
+            
+            //Inicio accion semantica 42
+            if(analizarSemantica){
+                FACTOR.tipo = cmp.ts.buscaTipo(num_num.entrada);
+            }
+            
+        } else if (cmp.be.preAnalisis.complex.equals("(")) {
             emparejar("(");
-            EXPRESION();
+            EXPRESION(EXPRESION);
             emparejar(")");
+            
+            //Inicio accion semantica 41
+            if(analizarSemantica){
+                FACTOR.tipo = EXPRESION.tipo;
+            }
         } else {
             error("[factor]: Se esperaba 'id', 'numero entero(num)', 'numero decimal(num.num)', '(', 'literal'" + cmp.be.preAnalisis.getNumLinea());
         }
@@ -903,11 +1046,25 @@ public class SintacticoSemantico {
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //FACTOR_P -> ( LISTA_EXPRESIONES ) | ε
     private void FACTOR_P(Atributos FACTOR_P) {
+        Atributos LISTA_EXPRESIONES = new Atributos();
+        
         if (preAnalisis.equals("(")) {
             emparejar("(");
-            LISTA_EXPRESIONES();
+            LISTA_EXPRESIONES(LISTA_EXPRESIONES);
             emparejar(")");
+            
+            //Inicia accion semantica 44
+            if(analizarSemantica){
+                FACTOR_P.tipo = LISTA_EXPRESIONES.tipo;
+            }
+            
+            
         } else {
+            
+            //Inicia accion semantica 45
+            if(analizarSemantica){
+                FACTOR_P.tipo = VACIO;
+            }
             //ε->vacio
         }
     }
