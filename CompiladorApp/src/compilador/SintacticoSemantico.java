@@ -47,6 +47,9 @@ public class SintacticoSemantico {
     public static final String VACIO = "Vacio";
     public static final String ERROR_TIPO = "Error_Tipo";
 
+    public static final String VACIO = "Vacio";
+    public static final String ERROR_TIPO = "Error_Tipo";
+    
     private Compilador cmp;
     private boolean analizarSemantica = false;
     private String preAnalisis;
@@ -126,15 +129,33 @@ public class SintacticoSemantico {
 
     //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
     //PROGRAMA -> INSTRUCCION PROGRAMA |  ε
+    
+    /*
+    INSTRUCCION  PROGRAMA1 {1}  | ϵ {2}
+    1
+    PROGRAMA.tipo := if INSTRUCCIÓN.tipo == VACIO and PROGRAMA1.tipo == VACIO then 
+             VACIO 
+          else 
+             ERROR_TIPO
+    2
+    PROGRAMA.tipo := VACIO
+
+
+    */
     private void PROGRAMA(Atributos PROGRAMA) {
         Atributos INSTRUCCION = new Atributos();
         if (preAnalisis.equals("def") //pro->funcion-> def
                 || preAnalisis.equals("int") || preAnalisis.equals("float")//pro->proposicion-> esto...
                 || preAnalisis.equals("id") || preAnalisis.equals("if") || preAnalisis.equals("while") || preAnalisis.equals("print") || preAnalisis.equals("string")) {
-            INSTRUCCION();
+            INSTRUCCION(INSTRUCCION);
             PROGRAMA(PROGRAMA);
+            if(INSTRUCCION.tipo.equals(VACIO)&&PROGRAMA.tipo.equals(VACIO))
+                PROGRAMA.tipo=VACIO;
+            else
+                PROGRAMA.tipo=ERROR_TIPO;
         } else {
             //ε->vacio
+                PROGRAMA.tipo=ERROR_TIPO;
             if(!preAnalisis.equals("$")){
                 error("[PROGRAMA]: Se esperaba fin del archivo."+
                         " Se encontro: "+cmp.be.preAnalisis.lexema+
@@ -143,14 +164,25 @@ public class SintacticoSemantico {
         }
     }
 
-     //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
-    //INSTRUCCION -> FUNCION | PROPSICION
+     //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764    
+    /*
+    INSTRUCCION -> FUNCION {3} | PROPOSICION	{4}
+    3
+    INSTRUCCIÓN.tipo := FUNCION.tipo
+    4
+    INSTRUCCIÓN.tipo := PROPOSICION.tipo
+    */
+
     private void INSTRUCCION(Atributos INSTRUCCION) {
+        Atributos FUNCION = new Atributos();
+        Atributos PROPOSICION = new Atributos();
         if (preAnalisis.equals("def")) {
-            FUNCION();
+            FUNCION(FUNCION);
+            INSTRUCCION.tipo=FUNCION.tipo;
         } else if (preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")
                 || preAnalisis.equals("id") || preAnalisis.equals("if") || preAnalisis.equals("while") || preAnalisis.equals("print")) {
-            PROPOSICION();
+            PROPOSICION(PROPOSICION);
+            INSTRUCCION.tipo=PROPOSICION.tipo;
         } else {
             error("[instruccion]Error en instruccion");
         }
@@ -158,47 +190,139 @@ public class SintacticoSemantico {
     
     
     //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
-    //FUNCION -> def id ( ARGUMENTOS ) : TIPO_RETORNO PROPOSICIONES_OPTATIVAS return RESULTADO ::
+    //FUNCION -> def id ( ARGUMENTOS ) : TIPO_RETORNO {5} PROPOSICIONES_OPTATIVAS  return RESULTADO :: {6}
+    /*
+    5
+    FUNCION.tipoaux := if buscaTipo ( id.entrada ) == nil then
+                      begin
+                         añadeTipo ( id.entrada, ARGUMENTOS.tipo || ‘->’ || TIPO_RETORNO.tipo )
+                         VACIO
+                      end 
+                   else
+                      ERROR_TIPO  //”Identificador ya fue declarado id.lexema”
+    6
+    FUNCION.tipo := if FUNCION.tipoaux == VACIO and PROPOSICIONES_OPTATIVAS == VACIO then
+                   Begin
+                      If ( RESULTADO.tipo == TIPO_RETORNO.tipo ) or
+                         ( TIPO_RETORNO.tipo == “float” and RESULTADO.tipo == “int” ) then 
+                             VACIO
+                      Else 
+                         ERROR_TIPO   // Tipo del resultado retornado no es compatible con el tipo
+                                      // de retorno de la función
+                   End
+                Else
+                   ERROR_TIPO // “Errores de tipo en la declaración de la funcion id.lexema”*/
     private void FUNCION(Atributos FUNCION) {
+        
+        Atributos ARGUMENTOS = new Atributos();
+        Atributos TIPO_RETORNO = new Atributos();
+        Atributos PROPOSICIONES_OPTATIVAS = new Atributos();
+        Atributos RESULTADO = new Atributos();
+        Linea_BE id = new Linea_BE ();
         if (preAnalisis.equals("def")) {
             emparejar("def");
             emparejar("id");
             emparejar("(");
-            ARGUMENTOS();
+            ARGUMENTOS(ARGUMENTOS);
             emparejar(")");
             emparejar(":");
             TIPO_RETORNO(TIPO_RETORNO);
-            PROPOSICIONES_OPTATIVAS();
+            if(cmp.ts.buscaTipo(id.entrada).equals(VACIO))
+            {//añadeTipo ( id.entrada, ARGUMENTOS.tipo || ‘->’ || TIPO_RETORNO.tipo )
+                String junto= ARGUMENTOS.tipo + "->" + TIPO_RETORNO.tipo;
+                cmp.ts.anadeTipo(id.entrada,junto);
+                FUNCION.tipoaux=VACIO;
+            }
+            
+            PROPOSICIONES_OPTATIVAS(PROPOSICIONES_OPTATIVAS);
             emparejar("return");
-            RESULTADO();
+            RESULTADO(RESULTADO);
             emparejar(":");
             emparejar(":");
-        } else {
-            //ε->vacio
+            if(FUNCION.tipoaux.equals(VACIO)&&PROPOSICIONES_OPTATIVAS.tipo.equals(VACIO)){
+                /*
+                    Begin
+                          If ( RESULTADO.tipo == TIPO_RETORNO.tipo ) or
+                             ( TIPO_RETORNO.tipo == “float” and RESULTADO.tipo == “int” ) then 
+                                 VACIO
+                          Else 
+                             ERROR_TIPO   // Tipo del resultado retornado no es compatible con el tipo
+                                          // de retorno de la función
+                       End
+                */
+                        if(RESULTADO.tipo.equals(TIPO_RETORNO.tipo)||
+                        TIPO_RETORNO.tipo.equals("float")&&
+                        RESULTADO.tipo.equals("int")){
+                            FUNCION.tipo=VACIO;
+                        }
+                        else
+                            FUNCION.tipo=ERROR_TIPO;
+            } else {
+                FUNCION.tipo=ERROR_TIPO;
+            }
         }
     }
     
     
     //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
-    //DECLARACION_VARS -> TIPO_DATO id DECLARACION_VARS_P
+    //DECLARACION_VARS	-> TIPO_DATO id  DECLARACION_VARS’ {27}
+
+    /*
+    DECLARACION_VARS := if buscaTipo ( id.entrada ) == nil && DECLARACION_VARS’ == VACIO then
+                      begin
+                         añadeTipo ( id.entrada, TIPO_DATO.tipo)
+                         VACIO
+                      end
+                   else
+    ERROR_TIPO // identificador ya fue declarado id.lexema
+
+    */
     private void DECLARACION_VARS(Atributos DECLARACION_VARS ) {
+          Atributos TIPO_DATO = new Atributos();
+        Atributos DECLARACION_VARS_P = new Atributos();
+        Linea_BE id = new Linea_BE ();
         if (preAnalisis.equals("int") || preAnalisis.equals("float") || preAnalisis.equals("string")) {
-            TIPO_DATO();
+            TIPO_DATO(TIPO_DATO);
             emparejar("id");
-            DECLARACION_VARS_P();
+            DECLARACION_VARS_P(DECLARACION_VARS_P);
+            if(cmp.ts.buscaTipo(id.entrada).equals(VACIO)&&
+                    DECLARACION_VARS_P.tipo.equals(VACIO)){
+                cmp.ts.anadeTipo(id.entrada,TIPO_DATO.tipo);
+                    DECLARACION_VARS.tipo=VACIO;
+            }
         } else {
+                    DECLARACION_VARS.tipo=ERROR_TIPO;
             error("[declaracion_vars]: Se esperaba un tipo de dato 'int', 'float', 'string'");
         }
     }
     
     
     //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
-    //DECLARACION_VARS_P -> , id DECLARACION_P | ε
+    //DECLARACION_VARS’	->, id  DECLARACION_VARS’{28}| ϵ{29}
+    /*
+    28
+    DECLARACION_VARS’ := if buscaTipo ( id.entrada ) == nil && DECLARACION_VARS’.tipo == VACIO then
+                      begin
+                         VACIO
+                      end
+                   else
+    ERROR_TIPO // identificador ya fue declarado id.lexema
+    29
+    DECLARACION_VARS’ := VACIO
+    */
     private void DECLARACION_VARS_P(Atributos DECLARACION_VARS_P) {
+        //Atributos DECLARACION_VARS_P2 = new Atributos();
+        Linea_BE id = new Linea_BE ();
         if (preAnalisis.equals(",")) {
             emparejar(",");
             emparejar("id");
-            DECLARACION_VARS_P();
+            DECLARACION_VARS_P(DECLARACION_VARS_P);
+            if( cmp.ts.buscaTipo(id.entrada).equals(VACIO)&&DECLARACION_VARS_P.tipo.equals(VACIO)){
+                DECLARACION_VARS_P.tipo=VACIO;
+            }else{
+                
+                DECLARACION_VARS_P.tipo=ERROR_TIPO;
+            }
         } else {
             //ε->vacio
         }
