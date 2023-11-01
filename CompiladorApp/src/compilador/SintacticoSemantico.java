@@ -153,6 +153,7 @@ public class SintacticoSemantico {
             
             INSTRUCCION(INSTRUCCION);
             PROGRAMA(PROGRAMA1);
+
             
             if ( analizarSemantica )
             {
@@ -873,6 +874,7 @@ public class SintacticoSemantico {
                 {
                     cmp.ts.anadeTipo ( id.entrada, TIPO_DATO.tipo );
                     ARGUMENTOS_P.tipo = VACIO;
+ 
                 }
                 else
                 {
@@ -1004,6 +1006,7 @@ public class SintacticoSemantico {
 
         } else if (preAnalisis.equals("literal")) {
             literal = cmp.be.preAnalisis;
+
             emparejar("literal");/********************************************************************************/
             cmp.ts.anadeTipo ( literal.entrada, "string" );
                     EXPRESION.tipo = "string";
