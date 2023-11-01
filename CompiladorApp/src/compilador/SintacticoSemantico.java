@@ -69,8 +69,10 @@ public class SintacticoSemantico {
         this.analizarSemantica = analizarSemantica;
         preAnalisis = cmp.be.preAnalisis.complex;
         // * * *   INVOCAR AQUI EL PROCEDURE DEL SIMBOLO INICIAL   * * *
-        Atributos PROGRAMA = new Atributos();
-        PROGRAMA(PROGRAMA);
+        /*Atributos PROGRAMA = new Atributos();
+        PROGRAMA(PROGRAMA);*/
+        
+        PROGRAMA( new Atributos());
     }
 
     
@@ -150,7 +152,8 @@ public class SintacticoSemantico {
                 || preAnalisis.equals("id") || preAnalisis.equals("if") || preAnalisis.equals("while") || preAnalisis.equals("print") || preAnalisis.equals("string")) {
             
             INSTRUCCION(INSTRUCCION);
-            PROGRAMA(PROGRAMA);
+            PROGRAMA(PROGRAMA1);
+
             
             if ( analizarSemantica )
             {
@@ -650,7 +653,7 @@ public class SintacticoSemantico {
                 {
                     PROPOSICION.tipo = ERROR_TIPO;
                     cmp.me.error(Compilador.ERR_SEMANTICO, 
-                        "[PROPOSICION]: Declaración de expresión inválida");
+                        "[PROPOSICION]: Declaración de expresión inválida"+EXPRESION.tipo+"  el tipo");
                 }
             }
             //Fin Accion semantica {20}
@@ -871,6 +874,7 @@ public class SintacticoSemantico {
                 {
                     cmp.ts.anadeTipo ( id.entrada, TIPO_DATO.tipo );
                     ARGUMENTOS_P.tipo = VACIO;
+ 
                 }
                 else
                 {
@@ -1002,7 +1006,11 @@ public class SintacticoSemantico {
 
         } else if (preAnalisis.equals("literal")) {
             literal = cmp.be.preAnalisis;
-            emparejar("literal");
+
+            emparejar("literal");/********************************************************************************/
+            cmp.ts.anadeTipo ( literal.entrada, "string" );
+                    EXPRESION.tipo = "string";
+            
         } else {
             error ( "[EXPRESION] Expresión no válida." + "N° Línea: " 
                     + cmp.be.preAnalisis.numLinea );    
