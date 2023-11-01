@@ -45,11 +45,11 @@ public class SintacticoSemantico {
 
     public static final String VACIO = "vacio";
     public static final String ERROR_TIPO = "error_tipo";
-    public static final String  NIL = "";
+    public static final String NIL = "";
     public static final String VOID = "";
     
     private Compilador cmp;
-    private boolean analizarSemantica = false;
+    private boolean analizarSemantica = true;
     private String preAnalisis;
     
     //--------------------------------------------------------------------------
@@ -165,7 +165,7 @@ public class SintacticoSemantico {
             }
         } else {
             //ε->vacio
-                PROGRAMA.tipo=VACIO;
+            PROGRAMA.tipo=VACIO;
             if(!preAnalisis.equals("$")){
                 error("[PROGRAMA]: Se esperaba fin del archivo."+
                         " Se encontro: "+cmp.be.preAnalisis.lexema+
@@ -288,7 +288,7 @@ public class SintacticoSemantico {
 
             if ( analizarSemantica )
             {
-                if ( RESULTADO.tipo .equals ( TIPO_RETORNO.tipo ) && FUNCION.tipo.equals ( VACIO ) )
+                if ( RESULTADO.tipo.equals( TIPO_RETORNO.tipo ) && FUNCION.tipo.equals( VACIO ) )
                     FUNCION.tipo = VACIO;
                 else
                 {
@@ -435,15 +435,17 @@ public class SintacticoSemantico {
         if (preAnalisis.equals("void")) //Primeros (TIPO_RETORNO) = {void, int, float, string}
         {
             emparejar(preAnalisis);
-            
+            //Accion semantica {7}
             TIPO_RETORNO.tipo = VOID;
+            //Fin Accion semantica {7}
         } 
         else if (preAnalisis.equals("int") || preAnalisis.equals("float") || 
                  preAnalisis.equals("string")) 
         {
             TIPO_DATO(TIPO_DATO);
-
+            //Accion semantica {8}
             TIPO_RETORNO.tipo = TIPO_DATO.tipo;
+            //Fin Accion semantica {8}
         } else {
             error ( "[TIPO_RETORNO] : Se esperaba un tipo de dato."  
             + cmp.be.preAnalisis.numLinea ); 
@@ -463,13 +465,17 @@ public class SintacticoSemantico {
         {
             EXPRESION(EXPRESION);
 
+            //Accion semantica {12}
             RESULTADO.tipo = EXPRESION.tipo;
+            //Fin accion semantica {12}
         } 
         else if (preAnalisis.equals("void")) 
         {
             emparejar("void");
 
+            //Accion semantica {13}
             RESULTADO.tipo = VOID;
+            //Fin Accion semantica {13}
         } else {
             // Manejar error sintáctico o lanzar una excepción si el preAnalisis no es válido.
             error ( " [RESULTADO]: literal, identificador, entero o flotante esperado" + 
@@ -493,6 +499,7 @@ public class SintacticoSemantico {
             PROPOSICION(PROPOSICION);
             PROPOSICIONES_OPTATIVAS(PROPOSICIONES_OPTATIVAS1);
 
+            //Accion Semantica {14}
             if ( analizarSemantica )
             {
                 if ( PROPOSICION.tipo.equals ( VACIO ) && PROPOSICIONES_OPTATIVAS1.tipo.equals ( VACIO ) )
@@ -504,6 +511,7 @@ public class SintacticoSemantico {
                         "[PROPOSICIONES OPTATIVAS]: Palabra reservada esperada");
                 }
             }
+            //Fin Accion semantica {14}
         } else {
             //ε->vacio
             PROPOSICIONES_OPTATIVAS.tipo = VACIO;
@@ -531,8 +539,9 @@ public class SintacticoSemantico {
         {
             DECLARACION_VARS ( DECLARACION_VARS );
             
+            //Accion semantica {16}
             PROPOSICION.tipo = DECLARACION_VARS.tipo;
-
+            //Fin accion semantica {16}
         }
         else if ( preAnalisis.equals( "id" ) )
         {
@@ -541,7 +550,7 @@ public class SintacticoSemantico {
             emparejar ( "id" );
             PROPOSICION_P ( PROPOSICION_P );
             
-        
+            //Accion semantica {17}
             if ( analizarSemantica )
             {
                 if ( cmp.ts.buscaTipo ( id.entrada ).equals ( PROPOSICION_P.tipo ) )
@@ -553,6 +562,7 @@ public class SintacticoSemantico {
                         "[PROPOSICION]: identificador redeclarado o tipo incompatible");
                 }
             }
+            //Fin Accion semantica {17}
          
         }
         else if ( preAnalisis.equals ( "if" ) )
@@ -562,7 +572,7 @@ public class SintacticoSemantico {
             emparejar ( ":" );
             PROPOSICIONES_OPTATIVAS ( PROPOSICIONES_OPTATIVAS1 );
             
-
+            //Accion semantica {18.1}
             if ( analizarSemantica )
             {
                 if ( CONDICION.tipo.equals ( "boolean" ) && PROPOSICIONES_OPTATIVAS1.tipo.equals ( VACIO ) )
@@ -574,23 +584,25 @@ public class SintacticoSemantico {
                         "[PROPOSICION]: Expresión de condición if inválida");
                 }
             }
-
+            //Fin accion semantica {18.1}
             
             emparejar ( "else" );
             emparejar ( ":" );
             PROPOSICIONES_OPTATIVAS ( PROPOSICIONES_OPTATIVAS2 );
 
+            //Accion semantica {18.2}
             if ( analizarSemantica )
             {
-            if ( PROPOSICION.tipoaux.equals ( VACIO ) && PROPOSICIONES_OPTATIVAS2.tipo.equals ( VACIO ) )
-                PROPOSICION.tipo = VACIO;
-            else
-            {
-                PROPOSICION.tipo = ERROR_TIPO;
-                cmp.me.error(Compilador.ERR_SEMANTICO, 
-                        "[PROPOSICION]: Expresión de condición else inválida");
+                if ( PROPOSICION.tipoaux.equals ( VACIO ) && PROPOSICIONES_OPTATIVAS2.tipo.equals ( VACIO ) )
+                    PROPOSICION.tipo = VACIO;
+                else
+                {
+                    PROPOSICION.tipo = ERROR_TIPO;
+                    cmp.me.error(Compilador.ERR_SEMANTICO, 
+                            "[PROPOSICION]: Expresión de condición else inválida");
+                }
             }
-            }
+            //Fin accion semantica {18.2}
          
             
             emparejar ( ":" );
@@ -603,7 +615,7 @@ public class SintacticoSemantico {
             emparejar ( ":" );
             PROPOSICIONES_OPTATIVAS ( PROPOSICIONES_OPTATIVAS3 );
             
-      
+            //Accion semantica {19}
             if ( analizarSemantica )
             {
                 if ( CONDICION1.tipo.equals ( "boolean" ) && PROPOSICIONES_OPTATIVAS3.tipo.equals ( VACIO ) )
@@ -615,7 +627,7 @@ public class SintacticoSemantico {
                         "[PROPOSICION]: Expresión de condición while inválida");
                 }
             }
-            
+            //Fin Accion semantica {19}
             
             emparejar ( ":" );
             emparejar ( ":" );
@@ -628,7 +640,7 @@ public class SintacticoSemantico {
             EXPRESION ( EXPRESION );
             emparejar ( ")" );
             
-           
+           //Accion semantica {20}
             if ( analizarSemantica )
             {
                 if ( EXPRESION.tipo.equals ( "int" ) || EXPRESION.tipo.equals ( "float" ) ||
@@ -641,6 +653,7 @@ public class SintacticoSemantico {
                         "[PROPOSICION]: Declaración de expresión inválida");
                 }
             }
+            //Fin Accion semantica {20}
             
         }
         else
@@ -660,14 +673,16 @@ public class SintacticoSemantico {
         {
             emparejar("opasig");
             EXPRESION(EXPRESION);
+            //Accion semantica {21}
             PROPOSICION_P.tipo = EXPRESION.tipo;
-
+            //Fin accion semantica{21}
         } 
         else if (preAnalisis.equals("(")) 
         {
             emparejar("(");
             LISTA_EXPRESIONES(LISTA_EXPRESIONES);
             emparejar(")");
+            //Accion semantica {22}
             if( analizarSemantica )
             {
                 String tipoid = cmp.ts.buscaTipo ( Integer.parseInt ( FACTOR_P.her ) );
@@ -694,7 +709,8 @@ public class SintacticoSemantico {
                     cmp.me.error(Compilador.ERR_SEMANTICO, 
                             "[PROPOSICION']: Expresión de tipo de dato inválida");
                 }
-                }
+            }
+            //fin accion semantica {22}
         } else {
             // Manejar error sintáctico o lanzar una excepción si el preAnalisis no es válido.
             error ( "[PROPOSICION_p]: Error de expresión en operador " +
@@ -720,6 +736,7 @@ public class SintacticoSemantico {
             emparejar ( "oprel" );
             EXPRESION ( EXPRESION1 );
       
+            //Accion semantica{23}
             if ( analizarSemantica )
             {
                 if ( ( EXPRESION.tipo.equals ( "int"   ) && EXPRESION1.tipo.equals ( "float" ) ) ||
@@ -733,6 +750,7 @@ public class SintacticoSemantico {
                         "[CONDICION]: Tipos incompatibles en la comparación");
                 }
             }
+            //fin accion semantica {23}
           
         } 
         else 
