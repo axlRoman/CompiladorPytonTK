@@ -152,7 +152,7 @@ public class SintacticoSemantico {
                 || preAnalisis.equals("id") || preAnalisis.equals("if") || preAnalisis.equals("while") || preAnalisis.equals("print") || preAnalisis.equals("string")) {
             
             INSTRUCCION(INSTRUCCION);
-            PROGRAMA(PROGRAMA);
+            PROGRAMA(PROGRAMA1);
             
             if ( analizarSemantica )
             {
@@ -652,7 +652,7 @@ public class SintacticoSemantico {
                 {
                     PROPOSICION.tipo = ERROR_TIPO;
                     cmp.me.error(Compilador.ERR_SEMANTICO, 
-                        "[PROPOSICION]: Declaración de expresión inválida");
+                        "[PROPOSICION]: Declaración de expresión inválida"+EXPRESION.tipo+"  el tipo");
                 }
             }
             //Fin Accion semantica {20}
@@ -1004,7 +1004,10 @@ public class SintacticoSemantico {
 
         } else if (preAnalisis.equals("literal")) {
             literal = cmp.be.preAnalisis;
-            emparejar("literal");
+            emparejar("literal");/********************************************************************************/
+            cmp.ts.anadeTipo ( literal.entrada, "string" );
+                    EXPRESION.tipo = "string";
+            
         } else {
             error ( "[EXPRESION] Expresión no válida." + "N° Línea: " 
                     + cmp.be.preAnalisis.numLinea );    
