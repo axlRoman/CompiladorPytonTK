@@ -261,7 +261,7 @@ public class SintacticoSemantico {
                 if ( cmp.ts.buscaTipo ( id.entrada ).equals ( NIL ) && ARGUMENTOS.tipo.equals ( VACIO ) &&
                      TIPO_RETORNO.tipo != ERROR_TIPO )
                 {
-                    cmp.ts.anadeTipo ( id.entrada, ARGUMENTOS.her + " -> " + TIPO_RETORNO.tipo );
+                    cmp.ts.anadeTipo ( id.entrada, ARGUMENTOS.her + " -> " + TIPO_RETORNO.tipo ); //se cambio a her??'
                     FUNCION.tipo = VACIO;
                 }
                 else
@@ -271,13 +271,13 @@ public class SintacticoSemantico {
                         "[FUNCIÓN]: Expresión inválida, identificador redeclarado o argumentos inválidos");
                 }
             }
-            
+                    //6
             PROPOSICIONES_OPTATIVAS(PROPOSICIONES_OPTATIVAS);
 
             if ( analizarSemantica )
             {
                 if ( PROPOSICIONES_OPTATIVAS.tipo.equals ( VACIO ) && FUNCION.tipo.equals ( VACIO ) )
-                    FUNCION.tipo = VACIO;
+                    FUNCION.tipo = VACIO;//falta comparacion bien de los tipos antes de dar el vacio...?
                 else
                 {
                     FUNCION.tipo = ERROR_TIPO;
@@ -677,7 +677,7 @@ public class SintacticoSemantico {
             emparejar("opasig");
             EXPRESION(EXPRESION);
             //Accion semantica {21}
-            PROPOSICION_P.tipo = EXPRESION.tipo;
+         //   PROPOSICION_P.tipo = EXPRESION.tipo;
             //Fin accion semantica{21}
         } 
         else if (preAnalisis.equals("(")) 
@@ -688,8 +688,10 @@ public class SintacticoSemantico {
             //Accion semantica {22}
             if( analizarSemantica )
             {
-                String tipoid = cmp.ts.buscaTipo ( Integer.parseInt ( FACTOR_P.her ) );
-                if ( tipoid.contains ( "->" ) )
+               
+               // String tipoid = cmp.ts.buscaTipo ( Integer.parseInt ( PROPOSICION_P.tipo ) );
+                String tipoid = "int";
+               if ( tipoid.contains ( "->" ) )
                 {
                     int indice = tipoid.indexOf ( "->" );
                     String aux = tipoid.substring ( indice );
