@@ -261,7 +261,7 @@ public class SintacticoSemantico {
                 if ( cmp.ts.buscaTipo ( id.entrada ).equals ( NIL ) && ARGUMENTOS.tipo.equals ( VACIO ) &&
                      TIPO_RETORNO.tipo != ERROR_TIPO )
                 {
-                    cmp.ts.anadeTipo ( id.entrada, ARGUMENTOS.her + " -> " + TIPO_RETORNO.tipo ); //se cambio a her??'
+                    cmp.ts.anadeTipo ( id.entrada, ARGUMENTOS.her + " -> " + TIPO_RETORNO.tipo );
                     FUNCION.tipo = VACIO;
                 }
                 else
@@ -271,13 +271,13 @@ public class SintacticoSemantico {
                         "[FUNCIÓN]: Expresión inválida, identificador redeclarado o argumentos inválidos");
                 }
             }
-                    //6
+            
             PROPOSICIONES_OPTATIVAS(PROPOSICIONES_OPTATIVAS);
 
             if ( analizarSemantica )
             {
                 if ( PROPOSICIONES_OPTATIVAS.tipo.equals ( VACIO ) && FUNCION.tipo.equals ( VACIO ) )
-                    FUNCION.tipo = VACIO;//falta comparacion bien de los tipos antes de dar el vacio...?
+                    FUNCION.tipo = VACIO;
                 else
                 {
                     FUNCION.tipo = ERROR_TIPO;
@@ -517,7 +517,9 @@ public class SintacticoSemantico {
             //Fin Accion semantica {14}
         } else {
             //ε->vacio
+            //Accion semantica {15}
             PROPOSICIONES_OPTATIVAS.tipo = VACIO;
+            //Fin accion semantica {15}
         }
     }
 
@@ -671,13 +673,14 @@ public class SintacticoSemantico {
         Atributos EXPRESION = new Atributos ();
         Atributos LISTA_EXPRESIONES = new Atributos ();
         Atributos FACTOR_P = new Atributos ();
-
+        Linea_BE id = new Linea_BE ();
+                
         if (preAnalisis.equals("opasig")) 
         {
             emparejar("opasig");
             EXPRESION(EXPRESION);
             //Accion semantica {21}
-         //   PROPOSICION_P.tipo = EXPRESION.tipo;
+            PROPOSICION_P.tipo = EXPRESION.tipo;
             //Fin accion semantica{21}
         } 
         else if (preAnalisis.equals("(")) 
@@ -688,10 +691,10 @@ public class SintacticoSemantico {
             //Accion semantica {22}
             if( analizarSemantica )
             {
-               
-               // String tipoid = cmp.ts.buscaTipo ( Integer.parseInt ( PROPOSICION_P.tipo ) );
-                String tipoid = "int";
-               if ( tipoid.contains ( "->" ) )
+                id = cmp.be.preAnalisis;
+                   String tipoid = cmp.ts.buscaTipo(id.entrada);
+//                String tipoid = cmp.ts.buscaTipo ( Integer.parseInt ( FACTOR_P.her ) );
+                if ( tipoid.contains ( "->" ) )
                 {
                     int indice = tipoid.indexOf ( "->" );
                     String aux = tipoid.substring ( indice );
@@ -774,21 +777,24 @@ public class SintacticoSemantico {
         if ( preAnalisis.equals ( "int" ) )
         {
             emparejar ( "int" );
-            
+            //Accion semantica {9} 
             TIPO_DATO.tipo = "int";
+            //Fin Accion semantica {9}
          
         }
         else if ( preAnalisis.equals ( "float" ) )
         {
             emparejar ( "float" );
-            
+            //Accion semantica {10}
             TIPO_DATO.tipo = "float";
+            //FIN Accion semantica {10}
         }
         else if ( preAnalisis.equals ( "string" ) )
         {
             emparejar ( "string" );
-            
+            //Accion semantica {11}
             TIPO_DATO.tipo = "string";
+            //FIN Accion semantica {11}
         }
         else
             error ( "[TIPO_DATO] : Tipo de dato esperado." +
@@ -812,7 +818,8 @@ public class SintacticoSemantico {
             id = cmp.be.preAnalisis;
             
             emparejar("id");
-                
+            
+            //ACCION SEMANTICA {30}
              if ( analizarSemantica ) 
             {
                 if ( cmp.ts.buscaTipo ( id.entrada ).equals ( NIL ) )
@@ -827,9 +834,11 @@ public class SintacticoSemantico {
                         "[ARGUMENTOS]: Identificador redeclarado o tipo de dato incompatible");
                 }
             }
+             //FIN ACCION SEMANTICA {30}
 
             ARGUMENTOS_P(ARGUMENTOS_P);
             
+            //ACCION SEMANTICA {30.1}
             if ( analizarSemantica )
             {
                 if ( ARGUMENTOS.tipo.equals ( VACIO ) && ARGUMENTOS_P.tipo.equals ( VACIO ) )
@@ -844,11 +853,14 @@ public class SintacticoSemantico {
                         "[ARGUMENTOS]: Argumento no valido");
                 }
             }
+            //FIN ACCION SEMANTICA {30.1}
         } 
         else 
         {
             //ε->vacio
+            //ACCION SEMANTICA {31}
             ARGUMENTOS.tipo = VACIO;
+            //FIN ACCION SEMANTICA {31}
         }
     }
     
@@ -870,6 +882,7 @@ public class SintacticoSemantico {
             id = cmp.be.preAnalisis;
             emparejar("id");
             
+            //ACCION SEMANTICA {32}
             if ( analizarSemantica )
             {
                 if ( cmp.ts.buscaTipo ( id.entrada ).equals ( NIL ) )
@@ -885,10 +898,11 @@ public class SintacticoSemantico {
                     "[ARGUMENTOS']: Identificador redeclarado o tipo de dato incompatible");
                 }
             }
+            //FIN ACCION SEMANTICA {32}
                 
                   
             ARGUMENTOS_P( ARGUMENTOS_P1);
-
+            //ACCION SEMANTICA {32.1}
             if (analizarSemantica) {
                 if (ARGUMENTOS_P.tipo.equals(VACIO) && ARGUMENTOS_P1.tipo.equals(VACIO)) {
                     ARGUMENTOS_P.her = TIPO_DATO.tipo + " X " + ARGUMENTOS_P1.her;
@@ -899,6 +913,7 @@ public class SintacticoSemantico {
                             "[ARGUMENTOS']: Argumento no valido");
                 }
             }
+            //FIN ACCION SEMANTICA {32.1}
                        
         } else {
             //ε->vacio
@@ -929,7 +944,7 @@ public class SintacticoSemantico {
             if ( analizarSemantica )
             {
                 if ( EXPRESION.tipo != ERROR_TIPO && LISTA_EXPRESIONES_P.tipo != ERROR_TIPO )
-                    LISTA_EXPRESIONES.tipo = EXPRESION.tipo + "X" + LISTA_EXPRESIONES_P.tipo;
+                    LISTA_EXPRESIONES.tipo = EXPRESION.tipo + " X " + LISTA_EXPRESIONES_P.tipo;
                 else
                 {
                     LISTA_EXPRESIONES.tipo = ERROR_TIPO;
@@ -963,7 +978,7 @@ public class SintacticoSemantico {
             if ( analizarSemantica )
             {
                 if ( EXPRESION.tipo != ERROR_TIPO && LISTA_EXPRESIONES_P1.tipo != ERROR_TIPO )
-                     LISTA_EXPRESIONES_P.tipo = EXPRESION.tipo + "X" + LISTA_EXPRESIONES_P1.tipo;
+                     LISTA_EXPRESIONES_P.tipo = EXPRESION.tipo + " X " + LISTA_EXPRESIONES_P1.tipo;
                 else
                 {
                     LISTA_EXPRESIONES_P.tipo = ERROR_TIPO;
@@ -1029,6 +1044,7 @@ public class SintacticoSemantico {
         if (preAnalisis.equals("opsuma")) {
             emparejar("opsuma");
             TERMINO(TERMINO);
+            //INICIO ACCION SEMANTICA {46}
             if ( analizarSemantica )
             {
                 if ( EXPRESION_P.her.equals ( "int"   ) && TERMINO.tipo.equals ( "float" ) ||
@@ -1043,14 +1059,18 @@ public class SintacticoSemantico {
                         "[EXPRESION']: Operación de suma de tipos incompatible");
                 }
             }
+            //FIN ACCION SEMANTICA {46}
             EXPRESION_P(EXPRESION_P1);
             if ( EXPRESION_P1.tipo.equals ( VACIO ) )
                 EXPRESION_P.tipo = EXPRESION_P1.her;
             else
                 EXPRESION_P.tipo = EXPRESION_P1.tipo;
         } else {
+            
             //ε->vacio
+            //ACCION SEMANTICA {26}
             EXPRESION_P.tipo = VACIO;
+            //FIN ACCION SEMANTICA {26}
         }
     }
     
@@ -1060,6 +1080,8 @@ public class SintacticoSemantico {
     private void TERMINO(Atributos TERMINO) {
         Atributos FACTOR = new Atributos ();
         Atributos TERMINO_P = new Atributos ();
+        
+        //ACCION SEMANTICO {38}
 
         if ( preAnalisis.equals ( "id" )      || preAnalisis.equals ( "num" ) || 
              preAnalisis.equals ( "num.num" ) || preAnalisis.equals ( "(" ) ) 
@@ -1077,6 +1099,7 @@ public class SintacticoSemantico {
         } else {
             error ( "[TERMINO]: se esperaba una expresion" );
         }
+        //FIN ACCION {38}
     }
     
     
@@ -1089,6 +1112,7 @@ public class SintacticoSemantico {
             emparejar("opmult");
             FACTOR(FACTOR);
 
+            //ACCION SEMANTICA {47}
             if ( analizarSemantica )
             {
                 if ( ( TERMINO_P.her.equals ( "int"   ) && FACTOR.tipo.equals ( "float") ) ||
@@ -1103,9 +1127,11 @@ public class SintacticoSemantico {
                         "[TERMINO']: Tipos de datos incompatibles en la operación de multiplicación");
                 }         
             }
+            //FIN ACCION SEMANTICA {47}
 
             TERMINO_P(TERMINO_P1);
 
+            //ACCION SEMANTICA {48}
             if ( analizarSemantica )
             {
                 if ( TERMINO_P1.tipo.equals ( VACIO ) )
@@ -1113,10 +1139,13 @@ public class SintacticoSemantico {
                 else
                     TERMINO_P.tipo = TERMINO_P1.tipo;
             }
+            //FIN ACCION SEMANTICA {48}
 
         } else {
             //ε->vacio
+            //ACCION SEMANTICA {39}
             TERMINO_P.tipo = VACIO;
+            //FIN ACCION SEMANTICA {39}
         }
     }
     
@@ -1136,6 +1165,7 @@ public class SintacticoSemantico {
             emparejar ( "id" );
             FACTOR_P ( FACTOR_P );
             
+            //ACCION SEMANTICA {40}
             if ( analizarSemantica )
             {
                 String tipoid = cmp.ts.buscaTipo ( id.entrada );
@@ -1164,27 +1194,32 @@ public class SintacticoSemantico {
                         "[FACTOR]: Expresión de tipo de dato inválida");
                     }
             }
+            //FIN ACCION SEMANTICA{40}
         } 
          else if ( preAnalisis.equals ( "num" ) ) 
          {
             num = cmp.be.preAnalisis;
             emparejar ( "num" );
             
+                //ACCION SEMANTICA {41}
             if ( analizarSemantica )
             {
                 cmp.ts.anadeTipo ( num.entrada, "int" );
                 FACTOR.tipo = cmp.ts.buscaTipo ( num.entrada );
             }
+            //FIN ACCION SEMANTICA {41}
         } 
         else if ( preAnalisis.equals ( "num.num" ) ) 
         {
             num_num = cmp.be.preAnalisis;
             emparejar ( "num.num" );
+            //ACCION SEMANTICA {42}
             if ( analizarSemantica )
             {
                 cmp.ts.anadeTipo ( num_num.entrada, "float" );
                 FACTOR.tipo = cmp.ts.buscaTipo ( num_num.entrada );
             }
+            //FIN ACCION SEMANTICA {42}
         } 
         else if ( preAnalisis.equals ( "(" ) ) 
         {
@@ -1192,6 +1227,7 @@ public class SintacticoSemantico {
             EXPRESION ( EXPRESION );
             emparejar ( ")" );
             
+            //ACCION SEMANTICA {43}
             if ( analizarSemantica )
             {
                 if ( EXPRESION.tipo != ERROR_TIPO && EXPRESION.tipo != "string" )
@@ -1203,6 +1239,7 @@ public class SintacticoSemantico {
                         "[FACTOR] Expresión de operación en paréntesis inválida");
                 }
             }
+            //FIN ACCION SEMANTICA {43}
         }
         else 
         {
@@ -1216,6 +1253,7 @@ public class SintacticoSemantico {
     //FACTOR_P -> ( LISTA_EXPRESIONES ) | ε
     private void FACTOR_P(Atributos FACTOR_P) {
         Atributos LISTA_EXPRESIONES = new Atributos ();
+        Linea_BE id = new Linea_BE ();
 
         if ( preAnalisis.equals ( "(" ) )
             {
@@ -1223,9 +1261,12 @@ public class SintacticoSemantico {
                 LISTA_EXPRESIONES ( LISTA_EXPRESIONES );
                 emparejar (")" );
                 
+                //ACCION SEMANTICA {44}
                 if( analizarSemantica )
                 {
-                    String tipoid = cmp.ts.buscaTipo ( Integer.parseInt ( FACTOR_P.her ) );
+ String tipoid = cmp.ts.buscaTipo ( id.entrada );
+               
+//                    String tipoid = cmp.ts.buscaTipo ( Integer.parseInt ( FACTOR_P.her ) );
                     if ( tipoid.contains ( "->" ) )
                     {
                         int indice = tipoid.indexOf ( "->" );
@@ -1250,10 +1291,13 @@ public class SintacticoSemantico {
                                 "[FACTOR']: Expresión de tipo de dato inválida ");
                     }
                 }
+                //FIN ACCION SEMANTICA {44}
             }
             else
             {
+                //ACCION SEMANTICA {45}
                 FACTOR_P.tipo = VACIO;
+                //FIN ACCION SEMANTICA {45}
             }
     }
 
