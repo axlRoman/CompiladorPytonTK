@@ -673,7 +673,8 @@ public class SintacticoSemantico {
         Atributos EXPRESION = new Atributos ();
         Atributos LISTA_EXPRESIONES = new Atributos ();
         Atributos FACTOR_P = new Atributos ();
-
+        Linea_BE id = new Linea_BE ();
+                
         if (preAnalisis.equals("opasig")) 
         {
             emparejar("opasig");
@@ -690,7 +691,9 @@ public class SintacticoSemantico {
             //Accion semantica {22}
             if( analizarSemantica )
             {
-                String tipoid = cmp.ts.buscaTipo ( Integer.parseInt ( FACTOR_P.her ) );
+                id = cmp.be.preAnalisis;
+                   String tipoid = cmp.ts.buscaTipo(id.entrada);
+//                String tipoid = cmp.ts.buscaTipo ( Integer.parseInt ( FACTOR_P.her ) );
                 if ( tipoid.contains ( "->" ) )
                 {
                     int indice = tipoid.indexOf ( "->" );
@@ -1250,6 +1253,7 @@ public class SintacticoSemantico {
     //FACTOR_P -> ( LISTA_EXPRESIONES ) | ε
     private void FACTOR_P(Atributos FACTOR_P) {
         Atributos LISTA_EXPRESIONES = new Atributos ();
+        Linea_BE id = new Linea_BE ();
 
         if ( preAnalisis.equals ( "(" ) )
             {
@@ -1260,7 +1264,9 @@ public class SintacticoSemantico {
                 //ACCION SEMANTICA {44}
                 if( analizarSemantica )
                 {
-                    String tipoid = cmp.ts.buscaTipo ( Integer.parseInt ( FACTOR_P.her ) );
+ String tipoid = cmp.ts.buscaTipo ( id.entrada );
+               
+//                    String tipoid = cmp.ts.buscaTipo ( Integer.parseInt ( FACTOR_P.her ) );
                     if ( tipoid.contains ( "->" ) )
                     {
                         int indice = tipoid.indexOf ( "->" );
