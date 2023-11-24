@@ -3,10 +3,10 @@ package compilador;
 
 public class Cuadruplo {
   
-    public String op;
-    public String arg1;
-    public String arg2;
-    public String resultado;
+    public String op        ="";
+    public String arg1      ="";
+    public String arg2      ="";
+    public String resultado ="";
 
     public Cuadruplo ( String op, String arg1, String arg2, String resultado) {
         this.op = op;

@@ -42,8 +42,9 @@ public class Compilador implements ICompilador {
 	BufferEntrada       be     = new BufferEntrada       ( this );
 	TablaSimbolos       ts     = new TablaSimbolos       ( this );
 	ManejErrores        me     = new ManejErrores        ( this );
+        
+        
 	GenCodigoInt        gci    = new GenCodigoInt        ( this );
-        GenCodigoObj        gco    = new GenCodigoObj        ( this );
         Cuadruplos          cua    = new Cuadruplos          ( this );
         
 	IUListener iuListener = null;
@@ -101,14 +102,7 @@ public class Compilador implements ICompilador {
 	}
     
 	//--------------------------------------------------------------------------
-
-        @Override
-	public void generarCodigoObj(){
-          gco.generar    ();             // Arrancar la generacion de codigo objeto
-	}
-    
-	//--------------------------------------------------------------------------
-        
+  
         @Override
 	public void agregIUListener ( IUListener listener ) {
             iuListener = listener;

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 
 public class Cuadruplos {
-    public  ArrayList<Cuadruplo> cuadruplos;
-    private Compilador cmp;
+    ArrayList<Cuadruplo> cuadruplos;
+    Compilador cmp;
     
     
     public Cuadruplos ( Compilador c ) {
