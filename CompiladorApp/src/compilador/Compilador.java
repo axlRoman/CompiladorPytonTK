@@ -46,7 +46,7 @@ public class Compilador implements ICompilador {
         
 	GenCodigoInt        gci    = new GenCodigoInt        ( this );
         Cuadruplos          cua    = new Cuadruplos          ( this );
-        
+        ErroresListener erroresListener = null;
 	IUListener iuListener = null;
 
 	//--------------------------------------------------------------------------
@@ -97,7 +97,7 @@ public class Compilador implements ICompilador {
 	public void generarCodigoInt(){
           me.inicializar ();
           be.restablecer ();             // Colocar el preAnalisis al inicio del buffer
-          cua.inicializar();
+          cua.inicializar();             //se limpian los cuadruplos 
           gci.generar    ();             // Arrancar la generacion de codigo intermedio
 	}
     
@@ -176,6 +176,11 @@ public class Compilador implements ICompilador {
                 arrCuadruplos [ i ][ 3 ] = cuadruplos.get ( i ).resultado;
             }
             return arrCuadruplos;
+    }
+
+    @Override
+    public void generarCodigoObj() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     
 }
