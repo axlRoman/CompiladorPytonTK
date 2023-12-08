@@ -1,17 +1,12 @@
-
 package compilador;
 
 public class Atributos {
-    String tipo;
+        String tipo;
     String her;
     String tipoaux;
     String lugar ;    
-    String op        ;
-    String verdadera ;
-    String falsa     ;
-    String siguiente ;
-    String codigo    ;
-    int tipoexpre;
+    boolean bandera;
+    String prefijo;
     
     
  public Atributos () {
@@ -19,12 +14,8 @@ public class Atributos {
         her = "";
         tipoaux = "";
         lugar     = "";  
-        op        = "";
-        verdadera = "";
-        falsa     = "";
-        siguiente = "";
-        codigo    = "";
-        tipoexpre=1;
+        bandera = false;
+        prefijo = "";
 
     }
 }
