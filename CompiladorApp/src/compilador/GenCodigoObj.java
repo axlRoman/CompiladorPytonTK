@@ -113,12 +113,41 @@ public class GenCodigoObj {
     //--------------------------------------------------------------------------
     // Algoritmo de generacion de codigo en ensamblador
     
+    
     private void algoritmoGCO () {
-     
-
+    ArrayList<Cuadruplo> cuadruplos = cmp.cua.getCuadruplos();
     
+        for (Cuadruplo cuadruplo : cuadruplos) {
 
+         String operador = cuadruplo.op;
+        String arg1 = cuadruplo.arg1;
+        String arg2 = cuadruplo.arg2;
+        String resultado = cuadruplo.resultado;
+
+        switch (operador) {
+            case "+":
+                mostrarLineaEnsamblador("ADD " + arg1 + ", " + arg2 + ", " + resultado);
+                break;
+            case "-":
+                mostrarLineaEnsamblador("SUB " + arg1 + ", " + arg2 + ", " + resultado);
+                break;
+            case "*":
+                mostrarLineaEnsamblador("MUL " + arg1 + ", " + arg2 + ", " + resultado);
+                break;
+            case "/":
+                mostrarLineaEnsamblador("DIV " + arg1 + ", " + arg2 + ", " + resultado);
+                break;
+            // Agrega más casos según tus operaciones
+            default:
+                // Operador no reconocido
+                break;
+        }
+        }
+        
     
+    }
+     private void mostrarLineaEnsamblador(String linea) {
+         cmp.iuListener.mostrarCodObj(linea);
     }
     
     //--------------------------------------------------------------------------
