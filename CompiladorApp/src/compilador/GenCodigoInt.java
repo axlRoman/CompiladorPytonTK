@@ -41,7 +41,7 @@ public class GenCodigoInt {
     private int        c3d = 0;
    
     private String     infija = "";
-    private int        consecutivoEtiq; 
+    //private int        consecutivoEtiq; 
     //private String preAnalisis;
     //--------------------------------------------------------------------------
     // Constructor de la clase, recibe la referencia de la clase principal del 
@@ -67,7 +67,7 @@ public class GenCodigoInt {
     //--------------------------------------------------------------------------
     
     private void emite ( String c3d ) {
-        cmp.iuListener.mostrarCodInt ( c3d + "\n" );
+        cmp.iuListener.mostrarCodInt ( c3d );
     }
 
     //--------------------------------------------------------------------------
@@ -396,7 +396,7 @@ public class GenCodigoInt {
             emparejar ( "id" );
             PROPOSICION_P ( PROPOSICION_P );
             emite(  id.lexema+ ":=" +PROPOSICION_P.lugar);
-            cmp.cua.agregar(new Cuadruplo ( ":=", PROPOSICION_P.lugar,"",id.lexema) );
+            cmp.cua.agregar(new Cuadruplo ( "=", PROPOSICION_P.lugar,"",id.lexema) );
          
         }
         else if ( cmp.be.preAnalisis.complex.equals ( "if" ) )
