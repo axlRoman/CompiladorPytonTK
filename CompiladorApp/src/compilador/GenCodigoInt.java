@@ -314,10 +314,10 @@ public class GenCodigoInt {
             emparejar ( "id" );
             PROPOSICION_P ( PROPOSICION_P );
 
-          //emite(  id.lexema+ ":=" +PROPOSICION_P.lugar);
-            cmp.cua.agregar(new Cuadruplo ( "=", PROPOSICION_P.lugar,"",id.lexema) );
+          //emite(  id.lexema+ ":=" +cmp.be.preAnalisis.entrada);
+          cmp.cua.agregar(new Cuadruplo ( "=", PROPOSICION_P.lugar,"",id.lexema) );
 
-         
+            System.out.println("");
         }
         else if ( cmp.be.preAnalisis.complex.equals ( "if" ) )
         {
@@ -503,13 +503,16 @@ private void TIPO_DATO ()
                 EXPRESION.bandera = true;
             cont++;
             TERMINO();
+            //--------------------------------------------------------------------------------------------------------
             EXPRESION_P();
             if (EXPRESION.bandera == true)
             {
                 EXPRESION.prefijo = infijo_a_prefijo ( infija, pre );
                 EXPRESION.lugar = generar_c3d_expresion (EXPRESION.prefijo, c3d );
-            }
             
+                if(EXPRESION.lugar.equals(""))
+                  EXPRESION.lugar=EXPRESION.prefijo;
+            }
 
     
         } else if (cmp.be.preAnalisis.complex.equals("literal")) {

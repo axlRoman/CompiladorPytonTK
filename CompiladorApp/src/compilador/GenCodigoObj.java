@@ -134,13 +134,16 @@ public class GenCodigoObj {
             case "/":
                 generarDivision(operando1, operando2, resultado);
                 break;
+            case "=":
+                generarIgual(operando1, resultado);
+                break;
             // Agrega más casos según las operaciones que manejes en tus cuádruplos
             default:
                 break;
         }
     }
 }
-
+/*
 private void generarSuma(String operando1, String operando2, String resultado) {
     cmp.iuListener.mostrarCodObj("  ; Suma");
     cmp.iuListener.mostrarCodObj("  mov ax, " + obtenerVariable(operando1));
@@ -158,7 +161,7 @@ private void generarResta(String operando1, String operando2, String resultado) 
 private void generarMultiplicacion(String operando1, String operando2, String resultado) {
     cmp.iuListener.mostrarCodObj("  ; Multiplicación");
     cmp.iuListener.mostrarCodObj("  mov ax, " + obtenerVariable(operando1));
-    cmp.iuListener.mostrarCodObj("  imul " + obtenerVariable(operando2));
+    cmp.iuListener.mostrarCodObj("  mul " + obtenerVariable(operando2));
     cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
 }
 
@@ -166,7 +169,47 @@ private void generarDivision(String operando1, String operando2, String resultad
     cmp.iuListener.mostrarCodObj("  ; División");
     cmp.iuListener.mostrarCodObj("  mov ax, " + obtenerVariable(operando1));
     cmp.iuListener.mostrarCodObj("  cwd");
-    cmp.iuListener.mostrarCodObj("  idiv " + obtenerVariable(operando2));
+    cmp.iuListener.mostrarCodObj("  div " + obtenerVariable(operando2));
+    cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
+}
+private void generarIgual(String operando1, String resultado) {
+    cmp.iuListener.mostrarCodObj("  ; igualacion");
+    cmp.iuListener.mostrarCodObj("  mov ax, " + obtenerVariable(operando1));
+    cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
+}
+*/
+    
+private void generarSuma(String operando1, String operando2, String resultado) {
+    cmp.iuListener.mostrarCodObj("  ; Suma");
+    cmp.iuListener.mostrarCodObj("  mov ax, " + operando1);
+    cmp.iuListener.mostrarCodObj("  add ax, " + (operando2));
+    cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
+}
+
+private void generarResta(String operando1, String operando2, String resultado) {
+    cmp.iuListener.mostrarCodObj("  ; Resta");
+    cmp.iuListener.mostrarCodObj("  mov ax, " + (operando1));
+    cmp.iuListener.mostrarCodObj("  sub ax, " + (operando2));
+    cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
+}
+
+private void generarMultiplicacion(String operando1, String operando2, String resultado) {
+    cmp.iuListener.mostrarCodObj("  ; Multiplicación");
+    cmp.iuListener.mostrarCodObj("  mov ax, " + (operando1));
+    cmp.iuListener.mostrarCodObj("  mul " + (operando2));
+    cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
+}
+
+private void generarDivision(String operando1, String operando2, String resultado) {
+    cmp.iuListener.mostrarCodObj("  ; División");
+    cmp.iuListener.mostrarCodObj("  mov ax, " + (operando1));
+    cmp.iuListener.mostrarCodObj("  cwd");
+    cmp.iuListener.mostrarCodObj("  div " + (operando2));
+    cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
+}
+private void generarIgual(String operando1, String resultado) {
+    cmp.iuListener.mostrarCodObj("  ; igualacion");
+    cmp.iuListener.mostrarCodObj("  mov ax, " + (operando1));
     cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
 }
 
