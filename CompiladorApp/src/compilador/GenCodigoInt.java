@@ -59,10 +59,10 @@ public class GenCodigoInt {
     }    
         
     //--------------------------------------------------------------------------
-	
+	/*
     private String etiqnueva () {
         return "etiq" + consecutivoEtiq++;
-    }    
+    }    */
         
     //--------------------------------------------------------------------------
     
@@ -76,7 +76,7 @@ public class GenCodigoInt {
         
         //preAnalisis = cmp.be.preAnalisis.complex;
         consecutivoTmp = 1;
-        consecutivoEtiq = 1;
+        //consecutivoEtiq = 1;
         cont = 0;
         pre = 0;
         c3d = 0;
@@ -154,10 +154,10 @@ public class GenCodigoInt {
 
     */
     private void PROGRAMA() {
-        if (cmp.be.preAnalisis.equals("def") //pro->funcion-> def
-                || cmp.be.preAnalisis.equals("int") || cmp.be.preAnalisis.equals("float")//pro->proposicion-> esto...
-                || cmp.be.preAnalisis.equals("id") || cmp.be.preAnalisis.equals("if") || cmp.be.preAnalisis.equals("while") 
-                || cmp.be.preAnalisis.equals("print") || cmp.be.preAnalisis.equals("string")) {
+        if (cmp.be.preAnalisis.complex.equals("def") //pro->funcion-> def
+                || cmp.be.preAnalisis.complex.equals("int") || cmp.be.preAnalisis.complex.equals("float")//pro->proposicion-> esto...
+                || cmp.be.preAnalisis.complex.equals("id") || cmp.be.preAnalisis.complex.equals("if") || cmp.be.preAnalisis.equals("while") 
+                || cmp.be.preAnalisis.complex.equals("print") || cmp.be.preAnalisis.complex.equals("string")) {
             
             infija = "";
             cont = 0;
@@ -189,14 +189,14 @@ public class GenCodigoInt {
 
     private void INSTRUCCION() {
         
-        if (cmp.be.preAnalisis.equals("def")) {
+        if (cmp.be.preAnalisis.complex.equals("def")) {
             FUNCION();
         
         } 
-        else if (cmp.be.preAnalisis.equals("int") || cmp.be.preAnalisis.equals("float") || 
-                 cmp.be.preAnalisis.equals("string") || cmp.be.preAnalisis.equals("id") || 
-                 cmp.be.preAnalisis.equals("if") || cmp.be.preAnalisis.equals("while") || 
-                 cmp.be.preAnalisis.equals("print")) 
+        else if (cmp.be.preAnalisis.complex.equals("int") || cmp.be.preAnalisis.complex.equals("float") || 
+                 cmp.be.preAnalisis.complex.equals("string") || cmp.be.preAnalisis.complex.equals("id") || 
+                 cmp.be.preAnalisis.complex.equals("if") || cmp.be.preAnalisis.complex.equals("while") || 
+                 cmp.be.preAnalisis.complex.equals("print")) 
         {
 
             PROPOSICION();
@@ -233,7 +233,7 @@ public class GenCodigoInt {
                    ERROR_TIPO // “Errores de tipo en la declaración de la funcion id.lexema”*/
     private void FUNCION() {
 
-        if (cmp.be.preAnalisis.equals("def")) {
+        if (cmp.be.preAnalisis.complex.equals("def")) {
 
             emparejar("def");
 //            id = cmp.be.preAnalisis;
@@ -272,8 +272,8 @@ public class GenCodigoInt {
 
     */
     private void DECLARACION_VARS() {
-        if (cmp.be.preAnalisis.equals("int") || cmp.be.preAnalisis.equals("float") || 
-            cmp.be.preAnalisis.equals("string")) 
+        if (cmp.be.preAnalisis.complex.equals("int") || cmp.be.preAnalisis.complex.equals("float") || 
+            cmp.be.preAnalisis.complex.equals("string")) 
         {
             TIPO_DATO();
 //            id = cmp.be.preAnalisis;
@@ -300,7 +300,7 @@ public class GenCodigoInt {
     DECLARACION_VARS’ := VACIO
     */
     private void DECLARACION_VARS_P() {
-        if (cmp.be.preAnalisis.equals(",")) {
+        if (cmp.be.preAnalisis.complex.equals(",")) {
             emparejar(",");
 //            id = cmp.be.preAnalisis;
             emparejar("id");
@@ -314,12 +314,12 @@ public class GenCodigoInt {
     //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
     //TIPO_RETORNO -> void | TIPO_DATO
     private void TIPO_RETORNO() {
-        if (cmp.be.preAnalisis.equals("void")) //Primeros (TIPO_RETORNO) = {void, int, float, string}
+        if (cmp.be.preAnalisis.complex.equals("void")) //Primeros (TIPO_RETORNO) = {void, int, float, string}
         {
             emparejar("void");
         } 
-        else if (cmp.be.preAnalisis.equals("int") || cmp.be.preAnalisis.equals("float") || 
-                 cmp.be.preAnalisis.equals("string")) 
+        else if (cmp.be.preAnalisis.complex.equals("int") || cmp.be.preAnalisis.equals("float") || 
+                 cmp.be.preAnalisis.complex.equals("string")) 
         {
             TIPO_DATO();
         } else {
@@ -335,14 +335,14 @@ public class GenCodigoInt {
         //Primeros (RESULTADO) = {void, literal, id, num, num.num, (, opsuma, empty, opmult, (, empty}
         Atributos EXPRESION =  new Atributos();
 
-        if  (cmp.be.preAnalisis.equals ( "literal" ) || cmp.be.preAnalisis.equals ( "id" )      ||
-             cmp.be.preAnalisis.equals ( "num" )     || cmp.be.preAnalisis.equals ( "num.num" ) ||
-             cmp.be.preAnalisis.equals ( "(" ) )  
+        if  (cmp.be.preAnalisis.complex.equals ( "literal" ) || cmp.be.preAnalisis.complex.equals ( "id" )      ||
+             cmp.be.preAnalisis.complex.equals ( "num" )     || cmp.be.preAnalisis.complex.equals ( "num.num" ) ||
+             cmp.be.preAnalisis.complex.equals ( "(" ) )  
         {
             EXPRESION(EXPRESION);
 
         } 
-        else if (cmp.be.preAnalisis.equals("void")) 
+        else if (cmp.be.preAnalisis.complex.equals("void")) 
         {
             emparejar("void");
 
@@ -360,10 +360,10 @@ public class GenCodigoInt {
         //Primeros (PROPOSICIONES_OPTATIVAS) = {id, if, while, print, int, float, string, empty}
 
 
-        if ( cmp.be.preAnalisis.equals ( "int" )    || cmp.be.preAnalisis.equals ( "float" ) || 
-             cmp.be.preAnalisis.equals ( "string" ) || cmp.be.preAnalisis.equals ( "id" )    || 
-             cmp.be.preAnalisis.equals ( "if" )     || cmp.be.preAnalisis.equals ( "while" ) || 
-             cmp.be.preAnalisis.equals ( "print" ) )
+        if ( cmp.be.preAnalisis.complex.equals ( "int" )    || cmp.be.preAnalisis.complex.equals ( "float" ) || 
+             cmp.be.preAnalisis.complex.equals ( "string" ) || cmp.be.preAnalisis.complex.equals ( "id" )    || 
+             cmp.be.preAnalisis.complex.equals ( "if" )     || cmp.be.preAnalisis.complex.equals ( "while" ) || 
+             cmp.be.preAnalisis.complex.equals ( "print" ) )
         {
             PROPOSICION();
             PROPOSICIONES_OPTATIVAS();
@@ -383,13 +383,13 @@ public class GenCodigoInt {
         Atributos EXPRESION = new Atributos();
         Linea_BE id = new Linea_BE ();
 
-        if ( cmp.be.preAnalisis.equals ( "int" ) || cmp.be.preAnalisis.equals ( "float" ) || 
-             cmp.be.preAnalisis.equals ( "string" ) )
+        if ( cmp.be.preAnalisis.complex.equals ( "int" ) || cmp.be.preAnalisis.complex.equals ( "float" ) || 
+             cmp.be.preAnalisis.complex.equals ( "string" ) )
         {
             DECLARACION_VARS ();
             
         }
-        else if ( cmp.be.preAnalisis.equals( "id" ) )
+        else if ( cmp.be.preAnalisis.complex.equals( "id" ) )
         {
           
             id = cmp.be.preAnalisis;
@@ -399,7 +399,7 @@ public class GenCodigoInt {
             cmp.cua.agregar(new Cuadruplo ( ":=", PROPOSICION_P.lugar,"",id.lexema) );
          
         }
-        else if ( cmp.be.preAnalisis.equals ( "if" ) )
+        else if ( cmp.be.preAnalisis.complex.equals ( "if" ) )
         {
             emparejar ( "if" );
             CONDICION ();
@@ -413,7 +413,7 @@ public class GenCodigoInt {
             emparejar ( ":" );
             emparejar ( ":" );
         }
-        else if ( cmp.be.preAnalisis.equals ( "while" ) )
+        else if ( cmp.be.preAnalisis.complex.equals ( "while" ) )
         {
             emparejar ( "while" );
             CONDICION();
@@ -424,7 +424,7 @@ public class GenCodigoInt {
             emparejar ( ":" );
             emparejar ( ":" );
         }
-        else if ( cmp.be.preAnalisis.equals ( "print" ) )
+        else if ( cmp.be.preAnalisis.complex.equals ( "print" ) )
         {
          
             emparejar ( "print" );
@@ -445,13 +445,13 @@ public class GenCodigoInt {
     public void PROPOSICION_P(Atributos PROPOSICION_P) {
         Atributos EXPRESION = new Atributos ();
                 
-        if (cmp.be.preAnalisis.equals("opasig")) 
+        if (cmp.be.preAnalisis.complex.equals("opasig")) 
         {
             emparejar("opasig");
             EXPRESION(EXPRESION);
             PROPOSICION_P.lugar = EXPRESION.lugar;
         } 
-        else if (cmp.be.preAnalisis.equals("(")) 
+        else if (cmp.be.preAnalisis.complex.equals("(")) 
         {
             emparejar("(");
             LISTA_EXPRESIONES();
@@ -470,11 +470,11 @@ public class GenCodigoInt {
         Atributos EXPRESION = new Atributos ();
         Atributos EXPRESION1 = new Atributos ();
 
-        if ( cmp.be.preAnalisis.equals ( "id" )      ||
-             cmp.be.preAnalisis.equals ( "num" )     ||
-             cmp.be.preAnalisis.equals ( "num.num" ) ||
-             cmp.be.preAnalisis.equals ( "(" )       ||
-             cmp.be.preAnalisis.equals ( "literal" ) ) 
+        if ( cmp.be.preAnalisis.complex.equals ( "id" )      ||
+             cmp.be.preAnalisis.complex.equals ( "num" )     ||
+             cmp.be.preAnalisis.complex.equals ( "num.num" ) ||
+             cmp.be.preAnalisis.complex.equals ( "(" )       ||
+             cmp.be.preAnalisis.complex.equals ( "literal" ) ) 
         {
         
             EXPRESION ( EXPRESION );
@@ -496,16 +496,16 @@ public class GenCodigoInt {
     //TIPO_DATO -> int | float | string
     private void TIPO_DATO ()
     {
-        if ( cmp.be.preAnalisis.equals ( "int" ) )
+        if ( cmp.be.preAnalisis.complex.equals ( "int" ) )
         {
             emparejar ( "int" );
          
         }
-        else if ( cmp.be.preAnalisis.equals ( "float" ) )
+        else if ( cmp.be.preAnalisis.complex.equals ( "float" ) )
         {
             emparejar ( "float" );
         }
-        else if ( cmp.be.preAnalisis.equals ( "string" ) )
+        else if ( cmp.be.preAnalisis.complex.equals ( "string" ) )
         {
             emparejar ( "string" );
         }
@@ -520,8 +520,8 @@ public class GenCodigoInt {
     //ARGUMENTOS -> TIPO_DATO id ARGUMENTOS_P | ε
     private void ARGUMENTOS() {
         
-        if (cmp.be.preAnalisis.equals("int") || cmp.be.preAnalisis.equals("float") || 
-            cmp.be.preAnalisis.equals("string")) {
+        if (cmp.be.preAnalisis.complex.equals("int") || cmp.be.preAnalisis.complex.equals("float") || 
+            cmp.be.preAnalisis.complex.equals("string")) {
             
             TIPO_DATO( );
 //            id = cmp.be.preAnalisis;          
@@ -541,7 +541,7 @@ public class GenCodigoInt {
     //ARGUEMNTOS_P -> , TIPO_DATO id ARGUEMNTOS_P | ε
     private void ARGUMENTOS_P() {
         
-        if (cmp.be.preAnalisis.equals(",")) 
+        if (cmp.be.preAnalisis.complex.equals(",")) 
         {
             emparejar(",");
             TIPO_DATO();
@@ -560,11 +560,11 @@ public class GenCodigoInt {
     {
         Atributos EXPRESION = new Atributos ();
         
-        if (cmp.be.preAnalisis.equals("literal")
-                || cmp.be.preAnalisis.equals("id")
-                || cmp.be.preAnalisis.equals("num")
-                || cmp.be.preAnalisis.equals("num.num")
-                || cmp.be.preAnalisis.equals("(")) {
+        if (cmp.be.preAnalisis.complex.equals("literal")
+                || cmp.be.preAnalisis.complex.equals("id")
+                || cmp.be.preAnalisis.complex.equals("num")
+                || cmp.be.preAnalisis.complex.equals("num.num")
+                || cmp.be.preAnalisis.complex.equals("(")) {
             
  // LISTA_EXPRESIONES -> EXPRESION  LISTA_EXPRESIONES'
             EXPRESION(EXPRESION);
@@ -580,7 +580,7 @@ public class GenCodigoInt {
         
         Atributos EXPRESION = new Atributos ();
         
-        if (cmp.be.preAnalisis.equals(",")) {
+        if (cmp.be.preAnalisis.complex.equals(",")) {
             
             emparejar(",");
             EXPRESION( EXPRESION);
@@ -596,10 +596,10 @@ public class GenCodigoInt {
     //EXPRESION -> TERMINO EXPRESION_P | literal
     private void EXPRESION(Atributos EXPRESION) 
     {
-        if (cmp.be.preAnalisis.equals("id")
-                || cmp.be.preAnalisis.equals("num")
-                || cmp.be.preAnalisis.equals("num.num")
-                || cmp.be.preAnalisis.equals("(")) {
+        if (cmp.be.preAnalisis.complex.equals("id")
+                || cmp.be.preAnalisis.complex.equals("num")
+                || cmp.be.preAnalisis.complex.equals("num.num")
+                || cmp.be.preAnalisis.complex.equals("(")) {
             if (cont == 0)
                 EXPRESION.bandera = true;
             cont++;
@@ -613,7 +613,7 @@ public class GenCodigoInt {
             
 
     
-        } else if (cmp.be.preAnalisis.equals("literal")) {
+        } else if (cmp.be.preAnalisis.complex.equals("literal")) {
             //literal = cmp.be.preAnalisis;
 
             emparejar("literal");/********************************************************************************/
@@ -634,7 +634,7 @@ public class GenCodigoInt {
     //EXPRESION_P -> opsuma TERMINO EXPRESION_P | ε
     private void EXPRESION_P() {
         Linea_BE opsuma = new Linea_BE ();
-        if (cmp.be.preAnalisis.equals("opsuma")) {
+        if (cmp.be.preAnalisis.complex.equals("opsuma")) {
             opsuma = cmp.be.preAnalisis;
             emparejar("opsuma");
             infija += opsuma.lexema + " ";
@@ -652,8 +652,8 @@ public class GenCodigoInt {
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //TERMINO -> FACTOR TERMINO_P
     private void TERMINO() {
-        if ( cmp.be.preAnalisis.equals ( "id" )      || cmp.be.preAnalisis.equals ( "num" ) || 
-             cmp.be.preAnalisis.equals ( "num.num" ) || cmp.be.preAnalisis.equals ( "(" ) ) 
+        if ( cmp.be.preAnalisis.complex.equals ( "id" )      || cmp.be.preAnalisis.complex.equals ( "num" ) || 
+             cmp.be.preAnalisis.complex.equals ( "num.num" ) || cmp.be.preAnalisis.complex.equals ( "(" ) ) 
         {
             FACTOR();
             TERMINO_P();
@@ -670,7 +670,7 @@ public class GenCodigoInt {
     //TERMINO_P -> opmult FACTOR TERMINO_P | ε
     private void TERMINO_P() {
         Linea_BE opmult = new Linea_BE ();
-        if (cmp.be.preAnalisis.equals("opmult")) {
+        if (cmp.be.preAnalisis.complex.equals("opmult")) {
             opmult = cmp.be.preAnalisis;
             emparejar("opmult");
             infija += opmult.lexema + " ";
@@ -694,7 +694,7 @@ public class GenCodigoInt {
         Linea_BE num = new Linea_BE ();
         Linea_BE num_num = new Linea_BE ();
 
-        if ( cmp.be.preAnalisis.equals ( "id" ) ) 
+        if ( cmp.be.preAnalisis.complex.equals ( "id" ) ) 
          {
             id = cmp.be.preAnalisis;
             emparejar ( "id" );
@@ -704,7 +704,7 @@ public class GenCodigoInt {
             FACTOR_P();
             
         } 
-         else if ( cmp.be.preAnalisis.equals ( "num" ) ) 
+         else if ( cmp.be.preAnalisis.complex.equals ( "num" ) ) 
          {
             num = cmp.be.preAnalisis;
             emparejar ( "num" );
@@ -713,7 +713,7 @@ public class GenCodigoInt {
             c3d++;
             
         } 
-        else if ( cmp.be.preAnalisis.equals ( "num.num" ) ) 
+        else if ( cmp.be.preAnalisis.complex.equals ( "num.num" ) ) 
         {
             num_num = cmp.be.preAnalisis;
             emparejar ( "num.num" );
@@ -721,7 +721,7 @@ public class GenCodigoInt {
             pre++;
             c3d++;
         } 
-        else if ( cmp.be.preAnalisis.equals ( "(" ) ) 
+        else if ( cmp.be.preAnalisis.complex.equals ( "(" ) ) 
         {
             emparejar ( "(" );
             infija += "( ";
@@ -745,7 +745,7 @@ public class GenCodigoInt {
     //FACTOR_P -> ( LISTA_EXPRESIONES ) | ε
     private void FACTOR_P() {
 
-        if ( cmp.be.preAnalisis.equals ( "(" ) )
+        if ( cmp.be.preAnalisis.complex.equals ( "(" ) )
             {
                 emparejar ( "(" );
                 LISTA_EXPRESIONES ();
