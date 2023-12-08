@@ -1,7 +1,7 @@
 package compilador;
 
 public class Atributos {
-        String tipo;
+    String tipo;
     String her;
     String tipoaux;
     String lugar ;    

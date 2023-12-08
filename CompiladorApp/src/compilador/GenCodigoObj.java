@@ -112,69 +112,63 @@ public class GenCodigoObj {
     
     //--------------------------------------------------------------------------
     // Algoritmo de generacion de codigo en ensamblador
-    
-    private void algoritmoGCO() {
-        ArrayList<String> codigoIntermedio = new ArrayList<>();
-    // Agrega las instrucciones del código intermedio
-    codigoIntermedio.add("x:=5");
-    codigoIntermedio.add("y:=8");
-    codigoIntermedio.add("t1:=x+1");
-    codigoIntermedio.add("t2:=2*t1");
-    codigoIntermedio.add("t3:=t2+y");
-    codigoIntermedio.add("x:=t3");
-    codigoIntermedio.add("t4:=12*x");
-    codigoIntermedio.add("t5:=t4*x");
-    codigoIntermedio.add("t6:=10*y");
-    codigoIntermedio.add("t7:=t5+t6");
-    codigoIntermedio.add("t8:=t7+99");
-    codigoIntermedio.add("y:=t8");
-    codigoIntermedio.add("t9:=y+3");
-    codigoIntermedio.add("t10:=t9+12");
-    codigoIntermedio.add("t11:=2*t10");
-    codigoIntermedio.add("t12:=t11*1");
-    codigoIntermedio.add("t13:=t12+x");
-    codigoIntermedio.add("z:=t13");
+    public void algoritmoGCO() {
+    ArrayList<Cuadruplo> cuadruplos = cmp.cua.getCuadruplos(); // Suponiendo que getCuadruplos() devuelve los cuádruplos
 
-    for (String instruccion : codigoIntermedio) {
-        String[] partes = instruccion.split(":=");
-        String leftSide = partes[0].trim();
-        String rightSide = partes[1].trim();
+    for (Cuadruplo cuadruplo : cuadruplos) {
+        String operacion = cuadruplo.op;
+        String operando1 = cuadruplo.arg1;
+        String operando2 = cuadruplo.arg2;
+        String resultado = cuadruplo.resultado;
 
-        if (rightSide.matches("\\d+")) {
-            cmp.iuListener.mostrarCodObj("  mov ax, " + rightSide);
-        } else {
-            String[] operandos = rightSide.split("[\\+\\-\\*/]");
-            String operador = rightSide.replaceAll("[^\\+\\-\\*/]", "");
-
-            if (operandos.length == 1) {
-                cmp.iuListener.mostrarCodObj("  mov ax, " + obtenerVariable(operandos[0].trim()));
-            } else {
-                cmp.iuListener.mostrarCodObj("  mov ax, " + obtenerVariable(operandos[0].trim()));
-                cmp.iuListener.mostrarCodObj("  mov bx, " + obtenerVariable(operandos[1].trim()));
-
-                switch (operador) {
-                    case "+":
-                        cmp.iuListener.mostrarCodObj("  add ax, bx");
-                        break;
-                    case "-":
-                        cmp.iuListener.mostrarCodObj("  sub ax, bx");
-                        break;
-                    case "*":
-                        cmp.iuListener.mostrarCodObj("  imul bx");
-                        break;
-                    case "/":
-                        cmp.iuListener.mostrarCodObj("  cdq");
-                        cmp.iuListener.mostrarCodObj("  idiv bx");
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        cmp.iuListener.mostrarCodObj("  mov " + leftSide + ", ax");
+        switch (operacion) {
+            case "+":
+                generarSuma(operando1, operando2, resultado);
+                break;
+            case "-":
+                generarResta(operando1, operando2, resultado);
+                break;
+            case "*":
+                generarMultiplicacion(operando1, operando2, resultado);
+                break;
+            case "/":
+                generarDivision(operando1, operando2, resultado);
+                break;
+            // Agrega más casos según las operaciones que manejes en tus cuádruplos
+            default:
+                break;
         }
     }
+}
+
+private void generarSuma(String operando1, String operando2, String resultado) {
+    cmp.iuListener.mostrarCodObj("  ; Suma");
+    cmp.iuListener.mostrarCodObj("  mov ax, " + obtenerVariable(operando1));
+    cmp.iuListener.mostrarCodObj("  add ax, " + obtenerVariable(operando2));
+    cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
+}
+
+private void generarResta(String operando1, String operando2, String resultado) {
+    cmp.iuListener.mostrarCodObj("  ; Resta");
+    cmp.iuListener.mostrarCodObj("  mov ax, " + obtenerVariable(operando1));
+    cmp.iuListener.mostrarCodObj("  sub ax, " + obtenerVariable(operando2));
+    cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
+}
+
+private void generarMultiplicacion(String operando1, String operando2, String resultado) {
+    cmp.iuListener.mostrarCodObj("  ; Multiplicación");
+    cmp.iuListener.mostrarCodObj("  mov ax, " + obtenerVariable(operando1));
+    cmp.iuListener.mostrarCodObj("  imul " + obtenerVariable(operando2));
+    cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
+}
+
+private void generarDivision(String operando1, String operando2, String resultado) {
+    cmp.iuListener.mostrarCodObj("  ; División");
+    cmp.iuListener.mostrarCodObj("  mov ax, " + obtenerVariable(operando1));
+    cmp.iuListener.mostrarCodObj("  cwd");
+    cmp.iuListener.mostrarCodObj("  idiv " + obtenerVariable(operando2));
+    cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
+}
 
 // Método para obtener el nombre de la variable
     private String obtenerVariable(String variable) {
