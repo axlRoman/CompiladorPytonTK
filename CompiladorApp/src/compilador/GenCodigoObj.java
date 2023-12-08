@@ -96,12 +96,14 @@ public class GenCodigoObj {
         ArrayList<Cuadruplo> cuadruplos = cmp.cua.getCuadruplos(); // Suponiendo que getCuadruplos() devuelve los cuádruplos
 
     for (Cuadruplo cuadruplo : cuadruplos) {
-        String operacion = cuadruplo.op;
         String operando1 = cuadruplo.arg1;
         String operando2 = cuadruplo.arg2;
-        String resultado = cuadruplo.resultado;
         if(operando1.charAt(0)=='t')
             cmp.iuListener.mostrarCodObj("  "+operando1+ " DW 0");
+        if(!operando2.isEmpty())
+            if(operando2.charAt(0)=='t')
+                cmp.iuListener.mostrarCodObj("  "+operando2+ " DW 0");
+
     }
         
         
@@ -181,9 +183,10 @@ private void generarResta(String operando1, String operando2, String resultado) 
 }
 
 private void generarMultiplicacion(String operando1, String operando2, String resultado) {
-    cmp.iuListener.mostrarCodObj("  ; Multiplicación");
+    cmp.iuListener.mostrarCodObj("  ; Multiplicacion");
     cmp.iuListener.mostrarCodObj("  mov ax, " + (operando1));
-    cmp.iuListener.mostrarCodObj("  mul " + (operando2));
+    cmp.iuListener.mostrarCodObj("  mov bx, " + (operando2));
+    cmp.iuListener.mostrarCodObj("  mul bx");
     cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
 }
 
