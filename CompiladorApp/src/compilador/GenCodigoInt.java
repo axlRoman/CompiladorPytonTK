@@ -66,16 +66,18 @@ public class GenCodigoInt {
     //--------------------------------------------------------------------------
     
     private void emite ( String c3d ) {
-        cmp.erroresListener.mostrarCodInt ( c3d + "\n" );
+        cmp.iuListener.mostrarCodInt ( c3d + "\n" );
     }
 
     //--------------------------------------------------------------------------
     
     public void generar () {
+        
+        preAnalisis = cmp.be.preAnalisis.complex;
         consecutivoTmp  = 1;
         consecutivoEtiq = 1;
         
-        //PROGRAMA ();
+        PROGRAMA (new Atributos());
     } 
     
     // Fin de analizar
@@ -167,6 +169,7 @@ public class GenCodigoInt {
     4
     INSTRUCCIÓN.tipo := PROPOSICION.tipo
     */
+    
 
     private void INSTRUCCION(Atributos INSTRUCCION) {
 
@@ -412,7 +415,7 @@ public class GenCodigoInt {
             emparejar ( "id" );
             PROPOSICION_P ( PROPOSICION_P );
             emite(  id.lexema+ ":=" +PROPOSICION_P.lugar);
-            
+            cmp.cua.agregar(new Cuadruplo ( ":=", PROPOSICION_P.lugar,"",id.lexema) );
          
         }
         else if ( preAnalisis.equals ( "if" ) )
