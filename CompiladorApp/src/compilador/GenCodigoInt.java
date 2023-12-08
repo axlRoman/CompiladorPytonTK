@@ -41,7 +41,7 @@ public class GenCodigoInt {
     private int        c3d = 0;
    
     private String     infija = "";
-    //private int        consecutivoEtiq; 
+
     //private String preAnalisis;
     //--------------------------------------------------------------------------
     // Constructor de la clase, recibe la referencia de la clase principal del 
@@ -87,7 +87,7 @@ public class GenCodigoInt {
     // Fin de analizar
     //--------------------------------------------------------------------------
    
-    //************EMPAREJAR**************//
+    //***********EMPAREJAR*************//
     private void emparejar ( String t ) {
 	if (cmp.be.preAnalisis.complex.equals ( t ) )
 		cmp.be.siguiente ();
@@ -138,21 +138,7 @@ public class GenCodigoInt {
     //--------------------------------------------------------------------------
 
 
-    //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
-    //PROGRAMA -> INSTRUCCION PROGRAMA |  ε
     
-    /*
-    INSTRUCCION  PROGRAMA1 {1}  | ϵ {2}
-    1
-    PROGRAMA.tipo := if INSTRUCCIÓN.tipo == VACIO and PROGRAMA1.tipo == VACIO then 
-             VACIO 
-          else 
-             ERROR_TIPO
-    2
-    PROGRAMA.tipo := VACIO
-
-
-    */
     private void PROGRAMA() {
         if (cmp.be.preAnalisis.complex.equals("def") //pro->funcion-> def
                 || cmp.be.preAnalisis.complex.equals("int") || cmp.be.preAnalisis.complex.equals("float")//pro->proposicion-> esto...
@@ -177,16 +163,7 @@ public class GenCodigoInt {
         
     }
 
-     //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764    
-    /*
-    INSTRUCCION -> FUNCION {3} | PROPOSICION	{4}
-    3
-    INSTRUCCIÓN.tipo := FUNCION.tipo
-    4
-    INSTRUCCIÓN.tipo := PROPOSICION.tipo
-    */
-    
-
+   
     private void INSTRUCCION() {
         
         if (cmp.be.preAnalisis.complex.equals("def")) {
@@ -208,29 +185,7 @@ public class GenCodigoInt {
     }
     
     
-    //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
-    //FUNCION -> def id ( ARGUMENTOS ) : TIPO_RETORNO {5} PROPOSICIONES_OPTATIVAS  return RESULTADO :: {6}
-    /*
-    5
-    FUNCION.tipoaux := if buscaTipo ( id.entrada ) == nil then
-                      begin
-                         añadeTipo ( id.entrada, ARGUMENTOS.tipo || ‘->’ || TIPO_RETORNO.tipo )
-                         VACIO
-                      end 
-                   else
-                      ERROR_TIPO  //”Identificador ya fue declarado id.lexema”
-    6
-    FUNCION.tipo := if FUNCION.tipoaux == VACIO and PROPOSICIONES_OPTATIVAS == VACIO then
-                   Begin
-                      If ( RESULTADO.tipo == TIPO_RETORNO.tipo ) or
-                         ( TIPO_RETORNO.tipo == “float” and RESULTADO.tipo == “int” ) then 
-                             VACIO
-                      Else 
-                         ERROR_TIPO   // Tipo del resultado retornado no es compatible con el tipo
-                                      // de retorno de la función
-                   End
-                Else
-                   ERROR_TIPO // “Errores de tipo en la declaración de la funcion id.lexema”*/
+
     private void FUNCION() {
 
         if (cmp.be.preAnalisis.complex.equals("def")) {
@@ -257,20 +212,6 @@ public class GenCodigoInt {
         }
     }
     
-    
-    //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
-    //DECLARACION_VARS	-> TIPO_DATO id  DECLARACION_VARS’ {27}
-
-    /*
-    DECLARACION_VARS := if buscaTipo ( id.entrada ) == nil && DECLARACION_VARS’ == VACIO then
-                      begin
-                         añadeTipo ( id.entrada, TIPO_DATO.tipo)
-                         VACIO
-                      end
-                   else
-    ERROR_TIPO // identificador ya fue declarado id.lexema
-
-    */
     private void DECLARACION_VARS() {
         if (cmp.be.preAnalisis.complex.equals("int") || cmp.be.preAnalisis.complex.equals("float") || 
             cmp.be.preAnalisis.complex.equals("string")) 
@@ -286,19 +227,6 @@ public class GenCodigoInt {
     }
     
     
-    //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764
-    //DECLARACION_VARS’	->, id  DECLARACION_VARS’{28}| ϵ{29}
-    /*
-    28
-    DECLARACION_VARS’ := if buscaTipo ( id.entrada ) == nil && DECLARACION_VARS’.tipo == VACIO then
-                      begin
-                         VACIO
-                      end
-                   else
-    ERROR_TIPO // identificador ya fue declarado id.lexema
-    29
-    DECLARACION_VARS’ := VACIO
-    */
     private void DECLARACION_VARS_P() {
         if (cmp.be.preAnalisis.complex.equals(",")) {
             emparejar(",");
@@ -311,8 +239,6 @@ public class GenCodigoInt {
     }
    
     
-    //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
-    //TIPO_RETORNO -> void | TIPO_DATO
     private void TIPO_RETORNO() {
         if (cmp.be.preAnalisis.complex.equals("void")) //Primeros (TIPO_RETORNO) = {void, int, float, string}
         {
@@ -329,8 +255,6 @@ public class GenCodigoInt {
     }
     
 
-    //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
-    // RESULTADO -> EXPRESION | void
     public void RESULTADO() {
         //Primeros (RESULTADO) = {void, literal, id, num, num.num, (, opsuma, empty, opmult, (, empty}
         Atributos EXPRESION =  new Atributos();
@@ -353,9 +277,6 @@ public class GenCodigoInt {
         }
     }
 
-
-    //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
-    // PROPOSICIONES_OPTATIVAS -> PROPOSICION PROPOSICIONES_OPTATIVAS | ε
     public void PROPOSICIONES_OPTATIVAS() {
         //Primeros (PROPOSICIONES_OPTATIVAS) = {id, if, while, print, int, float, string, empty}
 
@@ -374,9 +295,6 @@ public class GenCodigoInt {
     }
 
     
-    //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
-    //PROPOSICION -> DECLARACION_VARS | id PROPOSICION_P | if CONDICION : PROPOSICIONES_OPTATIVAS else : PROPOSICIONES_OPTATIVAS :: 
-    // | while CONDICION : PROPOSICIONES_OPTATIVAS :: | print ( EXPRESION )
     public void PROPOSICION() {
         //Primeros (PROPOSICION) = {id, if, while, print, int, float, string}
         Atributos PROPOSICION_P = new Atributos ();
@@ -395,8 +313,10 @@ public class GenCodigoInt {
             id = cmp.be.preAnalisis;
             emparejar ( "id" );
             PROPOSICION_P ( PROPOSICION_P );
-            emite(  id.lexema+ ":=" +PROPOSICION_P.lugar);
+
+          //emite(  id.lexema+ ":=" +PROPOSICION_P.lugar);
             cmp.cua.agregar(new Cuadruplo ( "=", PROPOSICION_P.lugar,"",id.lexema) );
+
          
         }
         else if ( cmp.be.preAnalisis.complex.equals ( "if" ) )
@@ -440,8 +360,6 @@ public class GenCodigoInt {
     }
     
     
-    //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
-    //PROPOSICION_P -> opasig EXPRESION | ( LISTA_EXPRESIONES )
     public void PROPOSICION_P(Atributos PROPOSICION_P) {
         Atributos EXPRESION = new Atributos ();
                 
@@ -463,8 +381,6 @@ public class GenCodigoInt {
         }
     }
     
-    //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
-    //CONDICION -> EXPERSION oprel EXPRESION
     public void CONDICION() 
     {
         Atributos EXPRESION = new Atributos ();
@@ -491,10 +407,7 @@ public class GenCodigoInt {
         }
     }
 
-
-    //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
-    //TIPO_DATO -> int | float | string
-    private void TIPO_DATO ()
+private void TIPO_DATO ()
     {
         if ( cmp.be.preAnalisis.complex.equals ( "int" ) )
         {
@@ -516,8 +429,6 @@ public class GenCodigoInt {
     
     
    
-    //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
-    //ARGUMENTOS -> TIPO_DATO id ARGUMENTOS_P | ε
     private void ARGUMENTOS() {
         
         if (cmp.be.preAnalisis.complex.equals("int") || cmp.be.preAnalisis.complex.equals("float") || 
@@ -536,9 +447,6 @@ public class GenCodigoInt {
         }
     }
     
-   
-    //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
-    //ARGUEMNTOS_P -> , TIPO_DATO id ARGUEMNTOS_P | ε
     private void ARGUMENTOS_P() {
         
         if (cmp.be.preAnalisis.complex.equals(",")) 
@@ -552,10 +460,6 @@ public class GenCodigoInt {
             //ε->vacio
         }
     }
-    
-
-    //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
-    //LISTA_EXPRESIONES -> EXPRESION LISTA_EXPRESIONES_P | ε
     private void LISTA_EXPRESIONES() 
     {
         Atributos EXPRESION = new Atributos ();
@@ -573,9 +477,6 @@ public class GenCodigoInt {
     }
     }
     
-    
-    //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
-    //LISTA_EXPRESIONES_P -> , EXPRESION LISTA_EXPRESIONES | ε
     private void LISTA_EXPRESIONES_P() {
         
         Atributos EXPRESION = new Atributos ();
@@ -592,8 +493,6 @@ public class GenCodigoInt {
     }
     
   
-    //Autor: Arturo Rosales Valdés - No. Control: 20130766
-    //EXPRESION -> TERMINO EXPRESION_P | literal
     private void EXPRESION(Atributos EXPRESION) 
     {
         if (cmp.be.preAnalisis.complex.equals("id")
@@ -617,21 +516,12 @@ public class GenCodigoInt {
             //literal = cmp.be.preAnalisis;
 
             emparejar("literal");/********************************************************************************/
-            //cmp.ts.anadeTipo ( literal.entrada, "string" );
-              //      EXPRESION.tipo = "string";
-            //accion semantica 11
-            
-           // EXPRESION.tipoexpre=2;
-            //fin accion semantica 11
         } else {
             error ( "[EXPRESION] Expresión no válida." + "N° Línea: " 
                     + cmp.be.preAnalisis.numLinea );    
         }
     }
     
-    
-    //Autor: Arturo Rosales Valdés - No. Control: 20130766
-    //EXPRESION_P -> opsuma TERMINO EXPRESION_P | ε
     private void EXPRESION_P() {
         Linea_BE opsuma = new Linea_BE ();
         if (cmp.be.preAnalisis.complex.equals("opsuma")) {
@@ -649,8 +539,6 @@ public class GenCodigoInt {
     }
     
     
-    //Autor: Arturo Rosales Valdés - No. Control: 20130766
-    //TERMINO -> FACTOR TERMINO_P
     private void TERMINO() {
         if ( cmp.be.preAnalisis.complex.equals ( "id" )      || cmp.be.preAnalisis.complex.equals ( "num" ) || 
              cmp.be.preAnalisis.complex.equals ( "num.num" ) || cmp.be.preAnalisis.complex.equals ( "(" ) ) 
@@ -665,9 +553,6 @@ public class GenCodigoInt {
         //FIN ACCION {38}
     }
     
-    
-    //Autor: Arturo Rosales Valdés - No. Control: 20130766
-    //TERMINO_P -> opmult FACTOR TERMINO_P | ε
     private void TERMINO_P() {
         Linea_BE opmult = new Linea_BE ();
         if (cmp.be.preAnalisis.complex.equals("opmult")) {
@@ -685,9 +570,6 @@ public class GenCodigoInt {
         }
     }
     
-    
-    //Autor: Arturo Rosales Valdés - No. Control: 20130766
-    //FACTOR -> id FACTOR_P | num | num.num | ( EXPRESION )
     private void FACTOR() {
         Atributos EXPRESION = new Atributos();
         Linea_BE id = new Linea_BE ();
@@ -741,8 +623,6 @@ public class GenCodigoInt {
     }
     
     
-    //Autor: Arturo Rosales Valdés - No. Control: 20130766
-    //FACTOR_P -> ( LISTA_EXPRESIONES ) | ε
     private void FACTOR_P() {
 
         if ( cmp.be.preAnalisis.complex.equals ( "(" ) )
@@ -757,9 +637,6 @@ public class GenCodigoInt {
        
             }
     }
-
-    // Método que convierte una expresión infija a prefija que recibe como parámetro
-    // la expresión infija y el número de símbolos terminales que la componen
     public static String infijo_a_prefijo ( String infix, int num ) 
     {
         // Pilas para almacenar los operandos y los operadores
@@ -914,6 +791,7 @@ public class GenCodigoInt {
                     temp = tempnuevo ();
                     // Se genera el c3d y se muestra
                     emite ( temp + ":=" + aux [ j ] + aux [ i ] + aux [ j + 1 ] );
+                    cmp.cua.agregar(new Cuadruplo ( aux [ i ],  aux [ j ],aux [ j + 1 ],temp) );
                     // Se asigna la variable temporal en la posición del operador y 
                     // se quitan los operandos
                     aux [ i ]     = temp;
