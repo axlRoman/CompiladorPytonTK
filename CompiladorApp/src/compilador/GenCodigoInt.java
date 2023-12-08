@@ -28,20 +28,21 @@ package compilador;
 import general.Linea_BE;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Stack;
 
 
 public class GenCodigoInt {
  
+    public static final int NIL = 0;
     private Compilador cmp;
-
-      public static final String VACIO = "vacio";
-    public static final String ERROR_TIPO = "error_tipo";
-    public static final String NIL = "";
-    public static final String VOID = "";
-     ArrayList<Character> arrExprInfijo = new ArrayList<>();
     private int        consecutivoTmp;
+    private int        cont = 0;
+    private int        pre = 0;
+    private int        c3d = 0;
+   
+    private String     infija = "";
     private int        consecutivoEtiq; 
-    private String preAnalisis;
+    //private String preAnalisis;
     //--------------------------------------------------------------------------
     // Constructor de la clase, recibe la referencia de la clase principal del 
     // compilador.
@@ -73,11 +74,14 @@ public class GenCodigoInt {
     
     public void generar () {
         
-        preAnalisis = cmp.be.preAnalisis.complex;
-        consecutivoTmp  = 1;
+        //preAnalisis = cmp.be.preAnalisis.complex;
+        consecutivoTmp = 1;
         consecutivoEtiq = 1;
-        
-        PROGRAMA (new Atributos());
+        cont = 0;
+        pre = 0;
+        c3d = 0;
+        infija = "";
+        PROGRAMA ();
     } 
     
     // Fin de analizar
@@ -149,16 +153,28 @@ public class GenCodigoInt {
 
 
     */
-    private void PROGRAMA(Atributos PROGRAMA) {
-        Atributos INSTRUCCION = new Atributos();
-        Atributos PROGRAMA1 = new Atributos ();
-        if (preAnalisis.equals("def") //pro->funcion-> def
-                || preAnalisis.equals("int") || preAnalisis.equals("float")//pro->proposicion-> esto...
-                || preAnalisis.equals("id") || preAnalisis.equals("if") || preAnalisis.equals("while") || preAnalisis.equals("print") || preAnalisis.equals("string")) {
+    private void PROGRAMA() {
+        if (cmp.be.preAnalisis.equals("def") //pro->funcion-> def
+                || cmp.be.preAnalisis.equals("int") || cmp.be.preAnalisis.equals("float")//pro->proposicion-> esto...
+                || cmp.be.preAnalisis.equals("id") || cmp.be.preAnalisis.equals("if") || cmp.be.preAnalisis.equals("while") 
+                || cmp.be.preAnalisis.equals("print") || cmp.be.preAnalisis.equals("string")) {
             
-            INSTRUCCION(INSTRUCCION);
-            PROGRAMA(PROGRAMA1);
-    }
+            infija = "";
+            cont = 0;
+            pre = 0;
+            c3d = 0;
+            
+            INSTRUCCION();
+            PROGRAMA();
+        }else 
+        {
+            // PROGRAMA -> empty 
+            
+            if ( cmp.be.preAnalisis.complex != ( "$" ) )
+                error ( "[PROGRAMA] = Declaración o documento en blanco esperado. " 
+                        + cmp.be.preAnalisis.numLinea );
+        }
+        
     }
 
      //Autor: Julian Rodolfo Villa Cruz - No. Control: 20130764    
@@ -171,26 +187,19 @@ public class GenCodigoInt {
     */
     
 
-    private void INSTRUCCION(Atributos INSTRUCCION) {
-
-        Atributos FUNCION = new Atributos();
-        Atributos PROPOSICION = new Atributos();
+    private void INSTRUCCION() {
         
-        if (preAnalisis.equals("def")) {
-            FUNCION(FUNCION);
-        
-            INSTRUCCION.tipo=FUNCION.tipo;
+        if (cmp.be.preAnalisis.equals("def")) {
+            FUNCION();
         
         } 
-        else if (preAnalisis.equals("int") || preAnalisis.equals("float") || 
-                 preAnalisis.equals("string") || preAnalisis.equals("id") || 
-                 preAnalisis.equals("if") || preAnalisis.equals("while") || 
-                 preAnalisis.equals("print")) 
+        else if (cmp.be.preAnalisis.equals("int") || cmp.be.preAnalisis.equals("float") || 
+                 cmp.be.preAnalisis.equals("string") || cmp.be.preAnalisis.equals("id") || 
+                 cmp.be.preAnalisis.equals("if") || cmp.be.preAnalisis.equals("while") || 
+                 cmp.be.preAnalisis.equals("print")) 
         {
 
-            PROPOSICION(PROPOSICION);
-
-            INSTRUCCION.tipo=PROPOSICION.tipo;
+            PROPOSICION();
 
         } else {
             error("[INSTRUCCION] -> Falta de palabra reservada. " 
@@ -222,31 +231,21 @@ public class GenCodigoInt {
                    End
                 Else
                    ERROR_TIPO // “Errores de tipo en la declaración de la funcion id.lexema”*/
-    private void FUNCION(Atributos FUNCION) {
-        
-        Atributos ARGUMENTOS = new Atributos();
-        Atributos TIPO_RETORNO = new Atributos();
-        Atributos PROPOSICIONES_OPTATIVAS = new Atributos();
-        Atributos RESULTADO = new Atributos();
-        Linea_BE id = new Linea_BE ();
+    private void FUNCION() {
 
-        if (preAnalisis.equals("def")) {
+        if (cmp.be.preAnalisis.equals("def")) {
 
             emparejar("def");
-            id = cmp.be.preAnalisis;
+//            id = cmp.be.preAnalisis;
             emparejar("id");
             emparejar("(");
-            ARGUMENTOS(ARGUMENTOS);
+            ARGUMENTOS();
             emparejar(")");
             emparejar(":");
-            TIPO_RETORNO(TIPO_RETORNO);
-
-            
-            PROPOSICIONES_OPTATIVAS(PROPOSICIONES_OPTATIVAS);
-
+            TIPO_RETORNO();
+            PROPOSICIONES_OPTATIVAS();
             emparejar("return");
-            RESULTADO(RESULTADO);
-
+            RESULTADO();
             emparejar(":");
             emparejar(":");
         }
@@ -254,7 +253,7 @@ public class GenCodigoInt {
         {
             error("[FUNCION] Expresión inválida "
                     + "se esperaba def y se encontró "
-                    + preAnalisis + cmp.be.preAnalisis.numLinea);
+                    + cmp.be.preAnalisis.complex + cmp.be.preAnalisis.numLinea);
         }
     }
     
@@ -272,20 +271,14 @@ public class GenCodigoInt {
     ERROR_TIPO // identificador ya fue declarado id.lexema
 
     */
-    private void DECLARACION_VARS(Atributos DECLARACION_VARS ) {
-
-        Atributos TIPO_DATO = new Atributos();
-        Atributos DECLARACION_VARS_P = new Atributos();
-        Linea_BE id = new Linea_BE ();
-
-        if (preAnalisis.equals("int") || preAnalisis.equals("float") || 
-            preAnalisis.equals("string")) 
+    private void DECLARACION_VARS() {
+        if (cmp.be.preAnalisis.equals("int") || cmp.be.preAnalisis.equals("float") || 
+            cmp.be.preAnalisis.equals("string")) 
         {
-            TIPO_DATO(TIPO_DATO);
-            id = cmp.be.preAnalisis;
+            TIPO_DATO();
+//            id = cmp.be.preAnalisis;
             emparejar("id");
-
-            DECLARACION_VARS_P(DECLARACION_VARS_P);
+            DECLARACION_VARS_P();
 
         } else {
             error("[declaracion_vars]: Se esperaba un tipo de dato 'int', 'float', 'string'");
@@ -306,16 +299,12 @@ public class GenCodigoInt {
     29
     DECLARACION_VARS’ := VACIO
     */
-    private void DECLARACION_VARS_P(Atributos DECLARACION_VARS_P) {
-        Atributos DECLARACION_VARS_P1 = new Atributos ();
-        Linea_BE id = new Linea_BE ();
-
-        if (preAnalisis.equals(",")) {
+    private void DECLARACION_VARS_P() {
+        if (cmp.be.preAnalisis.equals(",")) {
             emparejar(",");
-            id = cmp.be.preAnalisis;
+//            id = cmp.be.preAnalisis;
             emparejar("id");
-
-            DECLARACION_VARS_P(DECLARACION_VARS_P1);
+            DECLARACION_VARS_P();
         } else {
             //ε->vacio
         }
@@ -324,16 +313,15 @@ public class GenCodigoInt {
     
     //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
     //TIPO_RETORNO -> void | TIPO_DATO
-    private void TIPO_RETORNO(Atributos TIPO_RETORNO) {
-        Atributos TIPO_DATO = new Atributos();
-        if (preAnalisis.equals("void")) //Primeros (TIPO_RETORNO) = {void, int, float, string}
+    private void TIPO_RETORNO() {
+        if (cmp.be.preAnalisis.equals("void")) //Primeros (TIPO_RETORNO) = {void, int, float, string}
         {
-            emparejar(preAnalisis);
+            emparejar("void");
         } 
-        else if (preAnalisis.equals("int") || preAnalisis.equals("float") || 
-                 preAnalisis.equals("string")) 
+        else if (cmp.be.preAnalisis.equals("int") || cmp.be.preAnalisis.equals("float") || 
+                 cmp.be.preAnalisis.equals("string")) 
         {
-            TIPO_DATO(TIPO_DATO);
+            TIPO_DATO();
         } else {
             error ( "[TIPO_RETORNO] : Se esperaba un tipo de dato."  
             + cmp.be.preAnalisis.numLinea ); 
@@ -343,18 +331,18 @@ public class GenCodigoInt {
 
     //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
     // RESULTADO -> EXPRESION | void
-    public void RESULTADO(Atributos RESULTADO) {
+    public void RESULTADO() {
         //Primeros (RESULTADO) = {void, literal, id, num, num.num, (, opsuma, empty, opmult, (, empty}
         Atributos EXPRESION =  new Atributos();
 
-        if  (preAnalisis.equals ( "literal" ) || preAnalisis.equals ( "id" )      ||
-             preAnalisis.equals ( "num" )     || preAnalisis.equals ( "num.num" ) ||
-             preAnalisis.equals ( "(" ) )  
+        if  (cmp.be.preAnalisis.equals ( "literal" ) || cmp.be.preAnalisis.equals ( "id" )      ||
+             cmp.be.preAnalisis.equals ( "num" )     || cmp.be.preAnalisis.equals ( "num.num" ) ||
+             cmp.be.preAnalisis.equals ( "(" ) )  
         {
             EXPRESION(EXPRESION);
 
         } 
-        else if (preAnalisis.equals("void")) 
+        else if (cmp.be.preAnalisis.equals("void")) 
         {
             emparejar("void");
 
@@ -368,18 +356,17 @@ public class GenCodigoInt {
 
     //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
     // PROPOSICIONES_OPTATIVAS -> PROPOSICION PROPOSICIONES_OPTATIVAS | ε
-    public void PROPOSICIONES_OPTATIVAS(Atributos PROPOSICIONES_OPTATIVAS) {
+    public void PROPOSICIONES_OPTATIVAS() {
         //Primeros (PROPOSICIONES_OPTATIVAS) = {id, if, while, print, int, float, string, empty}
-        Atributos PROPOSICION = new Atributos ();
-        Atributos PROPOSICIONES_OPTATIVAS1 = new Atributos ();
 
-        if ( preAnalisis.equals ( "int" )    || preAnalisis.equals ( "float" ) || 
-             preAnalisis.equals ( "string" ) || preAnalisis.equals ( "id" )    || 
-             preAnalisis.equals ( "if" )     || preAnalisis.equals ( "while" ) || 
-             preAnalisis.equals ( "print" ) )
+
+        if ( cmp.be.preAnalisis.equals ( "int" )    || cmp.be.preAnalisis.equals ( "float" ) || 
+             cmp.be.preAnalisis.equals ( "string" ) || cmp.be.preAnalisis.equals ( "id" )    || 
+             cmp.be.preAnalisis.equals ( "if" )     || cmp.be.preAnalisis.equals ( "while" ) || 
+             cmp.be.preAnalisis.equals ( "print" ) )
         {
-            PROPOSICION(PROPOSICION);
-            PROPOSICIONES_OPTATIVAS(PROPOSICIONES_OPTATIVAS1);
+            PROPOSICION();
+            PROPOSICIONES_OPTATIVAS();
 
         } else {
             //ε->vacio
@@ -390,25 +377,19 @@ public class GenCodigoInt {
     //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
     //PROPOSICION -> DECLARACION_VARS | id PROPOSICION_P | if CONDICION : PROPOSICIONES_OPTATIVAS else : PROPOSICIONES_OPTATIVAS :: 
     // | while CONDICION : PROPOSICIONES_OPTATIVAS :: | print ( EXPRESION )
-    public void PROPOSICION(Atributos PROPOSICION) {
+    public void PROPOSICION() {
         //Primeros (PROPOSICION) = {id, if, while, print, int, float, string}
-        Atributos DECLARACION_VARS = new Atributos ();
         Atributos PROPOSICION_P = new Atributos ();
-        Atributos CONDICION = new Atributos ();
-        Atributos PROPOSICIONES_OPTATIVAS1 = new Atributos ();
-        Atributos PROPOSICIONES_OPTATIVAS2 = new Atributos ();
-        Atributos CONDICION1 = new Atributos ();
-        Atributos PROPOSICIONES_OPTATIVAS3 = new Atributos ();
-        Atributos EXPRESION = new Atributos ();
+        Atributos EXPRESION = new Atributos();
         Linea_BE id = new Linea_BE ();
 
-        if ( preAnalisis.equals ( "int" ) || preAnalisis.equals ( "float" ) || 
-             preAnalisis.equals ( "string" ) )
+        if ( cmp.be.preAnalisis.equals ( "int" ) || cmp.be.preAnalisis.equals ( "float" ) || 
+             cmp.be.preAnalisis.equals ( "string" ) )
         {
-            DECLARACION_VARS ( DECLARACION_VARS );
+            DECLARACION_VARS ();
             
         }
-        else if ( preAnalisis.equals( "id" ) )
+        else if ( cmp.be.preAnalisis.equals( "id" ) )
         {
           
             id = cmp.be.preAnalisis;
@@ -418,32 +399,32 @@ public class GenCodigoInt {
             cmp.cua.agregar(new Cuadruplo ( ":=", PROPOSICION_P.lugar,"",id.lexema) );
          
         }
-        else if ( preAnalisis.equals ( "if" ) )
+        else if ( cmp.be.preAnalisis.equals ( "if" ) )
         {
             emparejar ( "if" );
-            CONDICION ( CONDICION );
+            CONDICION ();
             emparejar ( ":" );
-            PROPOSICIONES_OPTATIVAS ( PROPOSICIONES_OPTATIVAS1 );
+            PROPOSICIONES_OPTATIVAS ();
             
             emparejar ( "else" );
             emparejar ( ":" );
-            PROPOSICIONES_OPTATIVAS ( PROPOSICIONES_OPTATIVAS2 );
+            PROPOSICIONES_OPTATIVAS ();
 
             emparejar ( ":" );
             emparejar ( ":" );
         }
-        else if ( preAnalisis.equals ( "while" ) )
+        else if ( cmp.be.preAnalisis.equals ( "while" ) )
         {
             emparejar ( "while" );
-            CONDICION ( CONDICION1 );
+            CONDICION();
             emparejar ( ":" );
-            PROPOSICIONES_OPTATIVAS ( PROPOSICIONES_OPTATIVAS3 );
+            PROPOSICIONES_OPTATIVAS ();
             
             
             emparejar ( ":" );
             emparejar ( ":" );
         }
-        else if ( preAnalisis.equals ( "print" ) )
+        else if ( cmp.be.preAnalisis.equals ( "print" ) )
         {
          
             emparejar ( "print" );
@@ -463,27 +444,17 @@ public class GenCodigoInt {
     //PROPOSICION_P -> opasig EXPRESION | ( LISTA_EXPRESIONES )
     public void PROPOSICION_P(Atributos PROPOSICION_P) {
         Atributos EXPRESION = new Atributos ();
-        Atributos LISTA_EXPRESIONES = new Atributos ();
-        Atributos FACTOR_P = new Atributos ();
-        Atributos E = new Atributos ();
-        Linea_BE id = new Linea_BE ();
                 
-        if (preAnalisis.equals("opasig")) 
+        if (cmp.be.preAnalisis.equals("opasig")) 
         {
             emparejar("opasig");
             EXPRESION(EXPRESION);
-            if(EXPRESION.tipoexpre==1){
-                EXPRESION.lugar=infixToPrefix(arrExprInfijo);
-                PROPOSICION_P.lugar=E.lugar;
-                
-            }else{
-                
-            }
+            PROPOSICION_P.lugar = EXPRESION.lugar;
         } 
-        else if (preAnalisis.equals("(")) 
+        else if (cmp.be.preAnalisis.equals("(")) 
         {
             emparejar("(");
-            LISTA_EXPRESIONES(LISTA_EXPRESIONES);
+            LISTA_EXPRESIONES();
             emparejar(")");
         } else {
             // Manejar error sintáctico o lanzar una excepción si el preAnalisis no es válido.
@@ -494,16 +465,16 @@ public class GenCodigoInt {
     
     //Autor: Francisco Axel Roman Cardoza - No. Control: 19130971
     //CONDICION -> EXPERSION oprel EXPRESION
-    public void CONDICION(Atributos CONDICION) 
+    public void CONDICION() 
     {
         Atributos EXPRESION = new Atributos ();
         Atributos EXPRESION1 = new Atributos ();
 
-        if ( preAnalisis.equals ( "id" )      ||
-             preAnalisis.equals ( "num" )     ||
-             preAnalisis.equals ( "num.num" ) ||
-             preAnalisis.equals ( "(" )       ||
-             preAnalisis.equals ( "literal" ) ) 
+        if ( cmp.be.preAnalisis.equals ( "id" )      ||
+             cmp.be.preAnalisis.equals ( "num" )     ||
+             cmp.be.preAnalisis.equals ( "num.num" ) ||
+             cmp.be.preAnalisis.equals ( "(" )       ||
+             cmp.be.preAnalisis.equals ( "literal" ) ) 
         {
         
             EXPRESION ( EXPRESION );
@@ -516,25 +487,25 @@ public class GenCodigoInt {
         {
             error ( "[CONDICION] Expresión inválida"
                     + " se esperaba id o num o num.num o ( o literal y se encontró "
-                    + preAnalisis + cmp.be.preAnalisis.numLinea );
+                    + cmp.be.preAnalisis.complex + cmp.be.preAnalisis.numLinea );
         }
     }
 
 
     //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
     //TIPO_DATO -> int | float | string
-    private void TIPO_DATO ( Atributos TIPO_DATO )
+    private void TIPO_DATO ()
     {
-        if ( preAnalisis.equals ( "int" ) )
+        if ( cmp.be.preAnalisis.equals ( "int" ) )
         {
             emparejar ( "int" );
          
         }
-        else if ( preAnalisis.equals ( "float" ) )
+        else if ( cmp.be.preAnalisis.equals ( "float" ) )
         {
             emparejar ( "float" );
         }
-        else if ( preAnalisis.equals ( "string" ) )
+        else if ( cmp.be.preAnalisis.equals ( "string" ) )
         {
             emparejar ( "string" );
         }
@@ -547,21 +518,16 @@ public class GenCodigoInt {
    
     //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
     //ARGUMENTOS -> TIPO_DATO id ARGUMENTOS_P | ε
-    private void ARGUMENTOS(Atributos ARGUMENTOS) {
+    private void ARGUMENTOS() {
         
-        Atributos TIPO_DATO = new Atributos ();
-        Atributos ARGUMENTOS_P = new Atributos ();
-        Linea_BE id = new Linea_BE ();
-        
-        if (preAnalisis.equals("int") || preAnalisis.equals("float") || 
-            preAnalisis.equals("string")) {
+        if (cmp.be.preAnalisis.equals("int") || cmp.be.preAnalisis.equals("float") || 
+            cmp.be.preAnalisis.equals("string")) {
             
-            TIPO_DATO( TIPO_DATO);
-            id = cmp.be.preAnalisis;
-            
+            TIPO_DATO( );
+//            id = cmp.be.preAnalisis;          
             emparejar("id");
             
-            ARGUMENTOS_P(ARGUMENTOS_P);
+            ARGUMENTOS_P();
             
         } 
         else 
@@ -573,23 +539,15 @@ public class GenCodigoInt {
    
     //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
     //ARGUEMNTOS_P -> , TIPO_DATO id ARGUEMNTOS_P | ε
-    private void ARGUMENTOS_P(Atributos ARGUMENTOS_P) {
+    private void ARGUMENTOS_P() {
         
-        Atributos TIPO_DATO = new Atributos ();
-        Atributos ARGUMENTOS_P1 = new Atributos ();
-        Atributos ARGUMENTOS = new Atributos ();
-        Linea_BE id = new Linea_BE ();
-        
-        
-        if (preAnalisis.equals(",")) 
+        if (cmp.be.preAnalisis.equals(",")) 
         {
             emparejar(",");
-            TIPO_DATO(TIPO_DATO);
-            id = cmp.be.preAnalisis;
-            emparejar("id");
-            
-                  
-            ARGUMENTOS_P( ARGUMENTOS_P1);
+            TIPO_DATO();
+            //id = cmp.be.preAnalisis;
+            emparejar("id");    
+            ARGUMENTOS_P( );
         } else {
             //ε->vacio
         }
@@ -598,20 +556,19 @@ public class GenCodigoInt {
 
     //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
     //LISTA_EXPRESIONES -> EXPRESION LISTA_EXPRESIONES_P | ε
-    private void LISTA_EXPRESIONES(Atributos LISTA_EXPRESIONES) 
+    private void LISTA_EXPRESIONES() 
     {
         Atributos EXPRESION = new Atributos ();
-        Atributos LISTA_EXPRESIONES_P = new Atributos ();
         
-        if (preAnalisis.equals("literal")
-                || preAnalisis.equals("id")
-                || preAnalisis.equals("num")
-                || preAnalisis.equals("num.num")
-                || preAnalisis.equals("(")) {
+        if (cmp.be.preAnalisis.equals("literal")
+                || cmp.be.preAnalisis.equals("id")
+                || cmp.be.preAnalisis.equals("num")
+                || cmp.be.preAnalisis.equals("num.num")
+                || cmp.be.preAnalisis.equals("(")) {
             
  // LISTA_EXPRESIONES -> EXPRESION  LISTA_EXPRESIONES'
             EXPRESION(EXPRESION);
-            LISTA_EXPRESIONES_P(LISTA_EXPRESIONES_P);
+            LISTA_EXPRESIONES_P();
     
     }
     }
@@ -619,16 +576,15 @@ public class GenCodigoInt {
     
     //Autor: Braulio Esteban Gonzalez Alanis - No. Control: 20131498
     //LISTA_EXPRESIONES_P -> , EXPRESION LISTA_EXPRESIONES | ε
-    private void LISTA_EXPRESIONES_P(Atributos LISTA_EXPRESIONES_P) {
+    private void LISTA_EXPRESIONES_P() {
         
         Atributos EXPRESION = new Atributos ();
-        Atributos LISTA_EXPRESIONES_P1 = new Atributos ();
         
-        if (preAnalisis.equals(",")) {
+        if (cmp.be.preAnalisis.equals(",")) {
             
             emparejar(",");
             EXPRESION( EXPRESION);
-            LISTA_EXPRESIONES_P(LISTA_EXPRESIONES_P1);
+            LISTA_EXPRESIONES_P();
             
         } else {
             //ε->vacio
@@ -640,32 +596,32 @@ public class GenCodigoInt {
     //EXPRESION -> TERMINO EXPRESION_P | literal
     private void EXPRESION(Atributos EXPRESION) 
     {
-        Atributos TERMINO = new Atributos ();
-        Atributos EXPRESION_P = new Atributos ();
-        Linea_BE literal = new Linea_BE ();
-
-        if (preAnalisis.equals("id")
-                || preAnalisis.equals("num")
-                || preAnalisis.equals("num.num")
-                || preAnalisis.equals("(")) {
-            TERMINO(TERMINO);
-            EXPRESION_P.her = TERMINO.tipo;
-            EXPRESION_P(EXPRESION_P);
-            //accion semantica 10
-            EXPRESION.tipoexpre=1;
-            //fin accion semantica 10
+        if (cmp.be.preAnalisis.equals("id")
+                || cmp.be.preAnalisis.equals("num")
+                || cmp.be.preAnalisis.equals("num.num")
+                || cmp.be.preAnalisis.equals("(")) {
+            if (cont == 0)
+                EXPRESION.bandera = true;
+            cont++;
+            TERMINO();
+            EXPRESION_P();
+            if (EXPRESION.bandera == true)
+            {
+                EXPRESION.prefijo = infijo_a_prefijo ( infija, pre );
+                EXPRESION.lugar = generar_c3d_expresion (EXPRESION.prefijo, c3d );
+            }
             
 
     
-        } else if (preAnalisis.equals("literal")) {
-            literal = cmp.be.preAnalisis;
+        } else if (cmp.be.preAnalisis.equals("literal")) {
+            //literal = cmp.be.preAnalisis;
 
             emparejar("literal");/********************************************************************************/
-            cmp.ts.anadeTipo ( literal.entrada, "string" );
-                    EXPRESION.tipo = "string";
+            //cmp.ts.anadeTipo ( literal.entrada, "string" );
+              //      EXPRESION.tipo = "string";
             //accion semantica 11
             
-            EXPRESION.tipoexpre=2;
+           // EXPRESION.tipoexpre=2;
             //fin accion semantica 11
         } else {
             error ( "[EXPRESION] Expresión no válida." + "N° Línea: " 
@@ -676,19 +632,16 @@ public class GenCodigoInt {
     
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //EXPRESION_P -> opsuma TERMINO EXPRESION_P | ε
-    private void EXPRESION_P(Atributos EXPRESION_P) {
-        Atributos TERMINO = new Atributos ();
-        Atributos EXPRESION_P1 = new Atributos ();
+    private void EXPRESION_P() {
         Linea_BE opsuma = new Linea_BE ();
-
-
-        if (preAnalisis.equals("opsuma")) {
+        if (cmp.be.preAnalisis.equals("opsuma")) {
+            opsuma = cmp.be.preAnalisis;
             emparejar("opsuma");
-             for (char c : opsuma.lexema.toCharArray()) {
-            arrExprInfijo.add( c );
-            }
-            TERMINO(TERMINO);
-            EXPRESION_P(EXPRESION_P1);
+            infija += opsuma.lexema + " ";
+            pre++;
+            c3d++;
+            TERMINO();
+            EXPRESION_P();
         } else {
             
             //ε->vacio
@@ -698,18 +651,12 @@ public class GenCodigoInt {
     
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //TERMINO -> FACTOR TERMINO_P
-    private void TERMINO(Atributos TERMINO) {
-        Atributos FACTOR = new Atributos ();
-        Atributos TERMINO_P = new Atributos ();
-        
-        //ACCION SEMANTICO {38}
-
-        if ( preAnalisis.equals ( "id" )      || preAnalisis.equals ( "num" ) || 
-             preAnalisis.equals ( "num.num" ) || preAnalisis.equals ( "(" ) ) 
+    private void TERMINO() {
+        if ( cmp.be.preAnalisis.equals ( "id" )      || cmp.be.preAnalisis.equals ( "num" ) || 
+             cmp.be.preAnalisis.equals ( "num.num" ) || cmp.be.preAnalisis.equals ( "(" ) ) 
         {
-            FACTOR(FACTOR);
-
-            TERMINO_P(TERMINO_P);
+            FACTOR();
+            TERMINO_P();
 
        
         } else {
@@ -721,18 +668,16 @@ public class GenCodigoInt {
     
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //TERMINO_P -> opmult FACTOR TERMINO_P | ε
-    private void TERMINO_P(Atributos TERMINO_P) {
-        Atributos FACTOR = new Atributos ();
-        Atributos TERMINO_P1 = new Atributos ();
+    private void TERMINO_P() {
         Linea_BE opmult = new Linea_BE ();
-        if (preAnalisis.equals("opmult")) {
+        if (cmp.be.preAnalisis.equals("opmult")) {
+            opmult = cmp.be.preAnalisis;
             emparejar("opmult");
-              for (char c : opmult.lexema.toCharArray()) {
-            arrExprInfijo.add( c );
-            }
-            FACTOR(FACTOR);
-
-            TERMINO_P(TERMINO_P1);
+            infija += opmult.lexema + " ";
+            pre++;
+            c3d++;
+            FACTOR ();            
+            TERMINO_P ();
 
        
         } else {
@@ -743,51 +688,49 @@ public class GenCodigoInt {
     
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //FACTOR -> id FACTOR_P | num | num.num | ( EXPRESION )
-    private void FACTOR(Atributos FACTOR) {
-        Atributos FACTOR_P = new Atributos ();
-        Atributos EXPRESION = new Atributos ();
+    private void FACTOR() {
+        Atributos EXPRESION = new Atributos();
         Linea_BE id = new Linea_BE ();
         Linea_BE num = new Linea_BE ();
         Linea_BE num_num = new Linea_BE ();
 
-        if ( preAnalisis.equals ( "id" ) ) 
+        if ( cmp.be.preAnalisis.equals ( "id" ) ) 
          {
             id = cmp.be.preAnalisis;
             emparejar ( "id" );
-         
-           for (char c : id.lexema.toCharArray()) {
-            arrExprInfijo.add( c );
-            }
-            FACTOR_P ( FACTOR_P );
+            infija += id.lexema + " ";
+            pre++;
+            c3d++;
+            FACTOR_P();
             
         } 
-         else if ( preAnalisis.equals ( "num" ) ) 
+         else if ( cmp.be.preAnalisis.equals ( "num" ) ) 
          {
             num = cmp.be.preAnalisis;
             emparejar ( "num" );
-            for (char c : num.lexema.toCharArray()) {
-            arrExprInfijo.add( c );
-            }
+            infija += num.lexema + " ";
+            pre++;
+            c3d++;
             
         } 
-        else if ( preAnalisis.equals ( "num.num" ) ) 
+        else if ( cmp.be.preAnalisis.equals ( "num.num" ) ) 
         {
             num_num = cmp.be.preAnalisis;
             emparejar ( "num.num" );
-            for (char c : num_num.lexema.toCharArray()) {
-            arrExprInfijo.add( c );
-            }
+            infija += num_num.lexema + " ";
+            pre++;
+            c3d++;
         } 
-        else if ( preAnalisis.equals ( "(" ) ) 
+        else if ( cmp.be.preAnalisis.equals ( "(" ) ) 
         {
             emparejar ( "(" );
-            arrExprInfijo.add( '(');
+            infija += "( ";
+            pre++;
             
             EXPRESION ( EXPRESION );
             emparejar ( ")" );
-             for (char c : num_num.lexema.toCharArray()) {
-            arrExprInfijo.add( ')' );
-            }
+            infija += ") ";
+            pre++;
             
         }
         else 
@@ -800,14 +743,12 @@ public class GenCodigoInt {
     
     //Autor: Arturo Rosales Valdés - No. Control: 20130766
     //FACTOR_P -> ( LISTA_EXPRESIONES ) | ε
-    private void FACTOR_P(Atributos FACTOR_P) {
-        Atributos LISTA_EXPRESIONES = new Atributos ();
-        Linea_BE id = new Linea_BE ();
+    private void FACTOR_P() {
 
-        if ( preAnalisis.equals ( "(" ) )
+        if ( cmp.be.preAnalisis.equals ( "(" ) )
             {
                 emparejar ( "(" );
-                LISTA_EXPRESIONES ( LISTA_EXPRESIONES );
+                LISTA_EXPRESIONES ();
                 emparejar (")" );
                 
             }
@@ -817,159 +758,236 @@ public class GenCodigoInt {
             }
     }
 
-    //--------------------------------------------------------------------------
-    public static boolean comparar ( String tipo1, String tipo2 ) 
+    // Método que convierte una expresión infija a prefija que recibe como parámetro
+    // la expresión infija y el número de símbolos terminales que la componen
+    public static String infijo_a_prefijo ( String infix, int num ) 
     {
-        return (
-            ( tipo1.equals ( tipo2    ) )                                ||
-            ( tipo1.equals ( "int"    ) && tipo2.equals ( "float"  ) )   ||
-            ( tipo1.equals ( "float"  ) && tipo2.equals ( "float"  ) )   ||
-            ( tipo1.equals ( "string" ) && tipo2.equals ( "string" ) )
-        );
-
-    }
-    
-    //--------------------------------------------------------------------------
-    
-    public static boolean esCompatible ( String T1, String T2 ) 
-    {
-        String T3 = T1.replace ( " ", "" );
-        String T4 = T2.replace ( " ", "" );
-        String [] tokens  = T3.split ( "[x X]" );
-        String [] tokens2 = T4.split ( "[x X]" );
-                
-        String resp = "";
-        int cont  = 0;//declaramos varible cont
-        int cont2 = 0;
-
-        for ( int j = 0; j < tokens.length; j++ )
-        {
-            cont++;            
-        }
+        // Pilas para almacenar los operandos y los operadores
+        Stack <String> OperandoStack = new Stack <> ();
+        Stack <String> OperadorStack = new Stack<> ();
         
-        for ( int k = 0; k < tokens2.length; k++ )
-        {
-            cont2++;
-        }
+        // Arreglo en el que se almacenan los componentes
+        String aux [] = new String [ num ];
+        // Variable para obtener substrings
+        int ini = 0;
         
-        if ( cont == cont2 )
+        for ( int i = 0, j = 0; i < infix.length () && j < aux.length; i++ ) 
         {
-            for ( int i = 0; i < tokens.length; i++ )
+            // En caso de que el componente de la cadena sea igual a ' ', se 
+            // obtiene una subcadena y se guarda en el arreglo
+            if ( infix.charAt ( i ) == ' ' )
             {
-
-                if ( comparar ( tokens [i],tokens2 [i] ) == true )
-                {
-                    resp += "true";
-                }
-                else
-                {
-                    resp += "false";
-                }
+                aux [ j ] = infix.substring ( ini, i );
+                ini = i + 1;
+                j++;
             }
         }
-        else
+
+        // Se recorre que al arreglo que contiene a los símbolos terminales
+        for ( String token : aux )
         {
-            return false;
+            // Si el símbolo es un operando se ingresa en la pila de operandos
+            if ( esOperando ( token.charAt ( 0 ) ) )
+            {
+                OperandoStack.push ( token + " " );
+            } 
+            else if ( token.charAt ( 0 ) == '(' || OperadorStack.isEmpty () || 
+                      isp ( token.charAt ( 0 ) ) > isp ( OperadorStack.peek ().charAt ( 0 ) ) )
+            {
+                // En caso de que se cumpla con las condiciones anteriores se mete
+                // el símbolo el la pila de operadores
+                OperadorStack.push ( token + " " );
+            } 
+            else if ( token.charAt ( 0 ) == ')' ) 
+            {
+                // Si el operador es un ) se almacenan los datos hasta que se encuentre un (
+                while ( OperadorStack.peek ().charAt ( 0 ) != '(' )
+                {
+                    String operator     = OperadorStack.pop();
+                    String RightOperand = OperandoStack.pop ();
+                    String LeftOperand  = OperandoStack.pop ();
+                    String operand      = operator + LeftOperand + RightOperand;
+                    OperandoStack.push ( operand );
+                }
+
+                OperadorStack.pop ();
+
+            } 
+            // Se compara el nivel de precedencia de los tokens
+            else if ( isp ( token.charAt ( 0 ) ) <= isp ( OperadorStack.peek ().charAt ( 0 ) ) )
+            {
+                // Mientras que la pila de operadores no este vacía y haya símbolos
+                // con niveles de precedencia inferiores se almacenan
+                while ( !OperadorStack.isEmpty () && 
+                        isp ( token.charAt ( 0 ) ) <= isp ( OperadorStack.peek ().charAt ( 0 ) ) )
+                {
+                    String operator     = OperadorStack.pop ();
+                    String RightOperand = OperandoStack.pop  ();
+                    String LeftOperand  = OperandoStack.pop  ();
+                    String operand      = operator + LeftOperand + RightOperand;
+                    OperandoStack.push ( operand );
+                }
+
+                OperadorStack.push(token + " ");
+
+            }
         }
-        
-        if ( resp.contains ( "false" ) ) 
-        {
-              return false;
-        }
-        else
-            return true;
-    }
     
-    /*Codigo para cambio de infijo a prefijo---------------------------------------------------*/
-    static boolean isalpha(char c) {
-        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+        // Mientras que la pila de los operadores no sea empty se almacenan los datos
+        while ( !OperadorStack.isEmpty () )
+        {
+            String operator     = OperadorStack.pop ();
+            String RightOperand = OperandoStack.pop  ();
+            String LeftOperand  = OperandoStack.pop  ();
+            String operand      = operator + LeftOperand + RightOperand;
+            OperandoStack.push ( operand );
+        }
+
+        // Se guarda el resultado en una String y se regresa el valor
+        String pre = OperandoStack.pop () + " ";
+        
+        return pre;
     }
 
-    static boolean isdigit(char c) {
-        return c >= '0' && c <= '9';
-    }
-
-    static boolean isOperator(char c) {
-        return !isalpha(c) && !isdigit(c);
-    }
-
-    static int getPriority(char C) {
-       switch (C) {
-            case '-':
-            case '+':
-                return 1;
+    //--------------------------------------------------------------------------
+    
+    // Método para determinar el índice o el nivel de precedencia de un caracter
+    public static int isp ( char token ) 
+    {
+        switch ( token ) 
+        {
+            // Si el token es un * o / se asigna un 2
             case '*':
             case '/':
                 return 2;
-            case '^':
-                return 3;
+
+            // Si el token es un + o - se asigna un 1
+            case '+':
+            case '-':
+                return 1;
+
             default:
-                break;
+                return -1;
+        }
+    }
+    
+    //--------------------------------------------------------------------------
+
+    // Método para generar el código de tres direcciones de una expresion
+    private  String generar_c3d_expresion ( String prefija, int num )
+    {
+        // Variables usadas en el método
+        String aux [] = new String [ num ];
+        String temp = "";
+        // Variable para obtener subcadenas
+        int ini = 0;
+        
+        // Se almacenan los símbolos terminales en un arreglo
+        for ( int i = 0, j = 0; i < prefija.length () && j < aux.length; i++ ) 
+        {
+            if ( prefija.charAt ( i ) == ' ' )
+            {
+                // Se obtiene una substring y se almacena en el arreglo
+                aux [ j ] = prefija.substring ( ini, i );
+                ini = i + 1;
+                j++;
+            }
         }
 
-        return 0;
-    }
+        // Variable para recorrer el arreglo
+        int tam = aux.length;
+        int j = 1;
+        // Se recorre el arreglo
+        for (int i = 0; i < tam; i++) 
+        {
+            for ( ; j < tam; j++ ) 
+            {
+                // Se evalúa si dentro de la cadena se encuentra un operador 
+                // seguido de dos operandos
+                if ( esOperador ( aux [ i ].charAt ( 0 ) ) && 
+                     esOperando ( aux [ j ].charAt ( 0 ) ) && 
+                     esOperando ( aux [ j + 1 ].charAt ( 0 ) ) )
+                {
+                    // En caso de que si se cumpla la condición se realiza lo siguiente
+                    
+                    // Se le da el valor a una variable temporal
+                    temp = tempnuevo ();
+                    // Se genera el c3d y se muestra
+                    emite ( temp + ":=" + aux [ j ] + aux [ i ] + aux [ j + 1 ] );
+                    // Se asigna la variable temporal en la posición del operador y 
+                    // se quitan los operandos
+                    aux [ i ]     = temp;
+                    aux [ j ]     = "";
+                    aux [ j + 1 ] = "";
+                    // Se inicializan los valores
+                    i = 0;
+                    j = 0;
+                    // Se disminuye el tamaño del recorrido
+                    tam -= 2;
+                    // Se crea un arreglo del tamaño de tam
+                    String aux1 [] = new String [ tam ];
 
-    static String reverse(char str[], int start, int end) {
-        char temp;
-        while (start < end) {
-            temp = str[start];
-            str[start] = str[end];
-            str[end] = temp;
-            start++;
-            end--;
-        }
-        return String.valueOf(str);
-    }
+                    // Se pasa el arreglo resultante a un arreglo auxiliar
+                    for ( int l = 0, k = 0; l < tam && k < prefija.length (); k++ ) 
+                    {
+                        if ( aux [ k ] != "" )
+                        {
+                            aux1 [ l ] = aux [ k ];
+                            l++;
+                        }
+                    }
 
-    static String infixToPostfix(ArrayList<Character> infix) {
-        ArrayList<Character> char_stack = new ArrayList<>();
-        StringBuilder output = new StringBuilder();
+                    // Se pasan los valores al arreglo original
+                    for ( int l = 0, k = 0; l < tam && k < tam; k++, l++ ) 
+                    {
+                        aux [ l ] = aux1 [ k ];  
+                    }
 
-        for (char c : infix) {
-            if (isalpha(c) || isdigit(c))
-                output.append(c);
-            else if (c == '(')
-                char_stack.add('(');
-            else if (c == ')') {
-                while (char_stack.get(char_stack.size() - 1) != '(') {
-                    output.append(char_stack.remove(char_stack.size() - 1));
+                    // En caso de que la posición 0 del arreglo sea una variable
+                    // temporal se rompe el ciclo
+                    if ( aux [ 0 ] == temp )
+                        break;
+                } 
+                else 
+                {
+                    // Se aumenta j y se rompe e ciclo
+                    j++;
+                    break;
                 }
-                char_stack.remove(char_stack.size() - 1); // Remove '(' from the stack
-            } else {
-                while (!char_stack.isEmpty() && isOperator(char_stack.get(char_stack.size() - 1))
-                        && (getPriority(c) <= getPriority(char_stack.get(char_stack.size() - 1))))
-                    output.append(char_stack.remove(char_stack.size() - 1));
-                char_stack.add(c);
             }
         }
-
-        while (!char_stack.isEmpty()) {
-            output.append(char_stack.remove(char_stack.size() - 1));
-        }
-
-        return output.toString();
+        
+        // Se regresa la variable temporal actual
+        return temp;
     }
 
-    static String infixToPrefix(ArrayList<Character> infix) {
-        Collections.reverse(infix);
-
-        for (int i = 0; i < infix.size(); i++) {
-            if (infix.get(i) == '(') {
-                infix.set(i, ')');
-            } else if (infix.get(i) == ')') {
-                infix.set(i, '(');
-            }
-        }
-
-        String postfix = infixToPostfix(infix);
-
-        StringBuilder prefix = new StringBuilder(postfix);
-        prefix.reverse();
-
-        return prefix.toString();
-    }
-    /*Fin del Codigo para cambio de infijo a prefijo---------------------------*/
+    //--------------------------------------------------------------------------
     
-    
+    // Método que determina si un elemento es un operador
+    private static boolean esOperador ( char c )
+    {
+        // Si el caracter es igual a + o * (operadores soportados por la gramática)
+        // se regresa true
+        if ( c == '+' || c == '*' )
+            return true;
+        else
+            return false;
     }
+   
+    //--------------------------------------------------------------------------
+
+    // Método que determina si un elemento es un operando
+    private static boolean esOperando ( char c )
+    {
+        // Si el caracter es una letra o un número se regresa true
+        if ( c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' )
+            return true;
+        else
+            return false;
+    }
+    
+    //--------------------------------------------------------------------------
+}
+
+    //--------------------------------------------------------------------------
+    //::
