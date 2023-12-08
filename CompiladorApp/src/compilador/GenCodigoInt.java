@@ -41,7 +41,7 @@ public class GenCodigoInt {
     private int        c3d = 0;
    
     private String     infija = "";
-    private int        consecutivoEtiq; 
+
     //private String preAnalisis;
     //--------------------------------------------------------------------------
     // Constructor de la clase, recibe la referencia de la clase principal del 
@@ -67,7 +67,7 @@ public class GenCodigoInt {
     //--------------------------------------------------------------------------
     
     private void emite ( String c3d ) {
-        cmp.iuListener.mostrarCodInt ( c3d + "\n" );
+        cmp.iuListener.mostrarCodInt ( c3d );
     }
 
     //--------------------------------------------------------------------------
@@ -163,7 +163,7 @@ public class GenCodigoInt {
         
     }
 
-    
+   
     private void INSTRUCCION() {
         
         if (cmp.be.preAnalisis.complex.equals("def")) {
@@ -185,7 +185,7 @@ public class GenCodigoInt {
     }
     
     
-    
+
     private void FUNCION() {
 
         if (cmp.be.preAnalisis.complex.equals("def")) {
@@ -212,9 +212,6 @@ public class GenCodigoInt {
         }
     }
     
-    
-    
-    
     private void DECLARACION_VARS() {
         if (cmp.be.preAnalisis.complex.equals("int") || cmp.be.preAnalisis.complex.equals("float") || 
             cmp.be.preAnalisis.complex.equals("string")) 
@@ -228,7 +225,6 @@ public class GenCodigoInt {
             error("[declaracion_vars]: Se esperaba un tipo de dato 'int', 'float', 'string'");
         }
     }
-    
     
     
     private void DECLARACION_VARS_P() {
@@ -281,7 +277,6 @@ public class GenCodigoInt {
         }
     }
 
-
     public void PROPOSICIONES_OPTATIVAS() {
         //Primeros (PROPOSICIONES_OPTATIVAS) = {id, if, while, print, int, float, string, empty}
 
@@ -318,8 +313,10 @@ public class GenCodigoInt {
             id = cmp.be.preAnalisis;
             emparejar ( "id" );
             PROPOSICION_P ( PROPOSICION_P );
-            //zemite(  id.lexema+ ":=" +PROPOSICION_P.lugar);
-            cmp.cua.agregar(new Cuadruplo ( ":=", PROPOSICION_P.lugar,"",id.lexema) );
+
+          //emite(  id.lexema+ ":=" +PROPOSICION_P.lugar);
+            cmp.cua.agregar(new Cuadruplo ( "=", PROPOSICION_P.lugar,"",id.lexema) );
+
          
         }
         else if ( cmp.be.preAnalisis.complex.equals ( "if" ) )
@@ -410,8 +407,7 @@ public class GenCodigoInt {
         }
     }
 
-
-    private void TIPO_DATO ()
+private void TIPO_DATO ()
     {
         if ( cmp.be.preAnalisis.complex.equals ( "int" ) )
         {
@@ -451,7 +447,6 @@ public class GenCodigoInt {
         }
     }
     
-   
     private void ARGUMENTOS_P() {
         
         if (cmp.be.preAnalisis.complex.equals(",")) 
@@ -465,8 +460,6 @@ public class GenCodigoInt {
             //ε->vacio
         }
     }
-    
-
     private void LISTA_EXPRESIONES() 
     {
         Atributos EXPRESION = new Atributos ();
@@ -483,7 +476,6 @@ public class GenCodigoInt {
     
     }
     }
-    
     
     private void LISTA_EXPRESIONES_P() {
         
@@ -530,7 +522,6 @@ public class GenCodigoInt {
         }
     }
     
-    
     private void EXPRESION_P() {
         Linea_BE opsuma = new Linea_BE ();
         if (cmp.be.preAnalisis.complex.equals("opsuma")) {
@@ -562,7 +553,6 @@ public class GenCodigoInt {
         //FIN ACCION {38}
     }
     
-    
     private void TERMINO_P() {
         Linea_BE opmult = new Linea_BE ();
         if (cmp.be.preAnalisis.complex.equals("opmult")) {
@@ -579,7 +569,6 @@ public class GenCodigoInt {
             //ε->vacio
         }
     }
-    
     
     private void FACTOR() {
         Atributos EXPRESION = new Atributos();
@@ -648,7 +637,6 @@ public class GenCodigoInt {
        
             }
     }
-
     public static String infijo_a_prefijo ( String infix, int num ) 
     {
         // Pilas para almacenar los operandos y los operadores
@@ -740,6 +728,7 @@ public class GenCodigoInt {
 
     //--------------------------------------------------------------------------
     
+    // Método para determinar el índice o el nivel de precedencia de un caracter
     public static int isp ( char token ) 
     {
         switch ( token ) 
@@ -761,6 +750,7 @@ public class GenCodigoInt {
     
     //--------------------------------------------------------------------------
 
+    // Método para generar el código de tres direcciones de una expresion
     private  String generar_c3d_expresion ( String prefija, int num )
     {
         // Variables usadas en el método
@@ -851,8 +841,11 @@ public class GenCodigoInt {
 
     //--------------------------------------------------------------------------
     
+    // Método que determina si un elemento es un operador
     private static boolean esOperador ( char c )
     {
+        // Si el caracter es igual a + o * (operadores soportados por la gramática)
+        // se regresa true
         if ( c == '+' || c == '*' )
             return true;
         else
