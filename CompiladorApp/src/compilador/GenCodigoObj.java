@@ -27,7 +27,10 @@
 package compilador;
 
 import general.Linea_TS;
-
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class GenCodigoObj {
  
@@ -111,7 +114,11 @@ public class GenCodigoObj {
     // Algoritmo de generacion de codigo en ensamblador
     
     private void algoritmoGCO () {
-        
+     
+
+    
+
+    
     }
     
     //--------------------------------------------------------------------------

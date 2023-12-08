@@ -42,10 +42,12 @@ public class Compilador implements ICompilador {
 	BufferEntrada       be     = new BufferEntrada       ( this );
 	TablaSimbolos       ts     = new TablaSimbolos       ( this );
 	ManejErrores        me     = new ManejErrores        ( this );
-	GenCodigoInt        gci    = new GenCodigoInt        ( this );
-        GenCodigoObj        gco    = new GenCodigoObj        ( this );
-        Cuadruplos          cua    = new Cuadruplos          ( this );
         
+        
+	GenCodigoInt        gci    = new GenCodigoInt        ( this );
+        Cuadruplos          cua    = new Cuadruplos          ( this );
+        GenCodigoObj        gco    = new GenCodigoObj        ( this );
+        ErroresListener erroresListener = null;
 	IUListener iuListener = null;
 
 	//--------------------------------------------------------------------------
@@ -96,19 +98,20 @@ public class Compilador implements ICompilador {
 	public void generarCodigoInt(){
           me.inicializar ();
           be.restablecer ();             // Colocar el preAnalisis al inicio del buffer
-          cua.inicializar();
+          cua.inicializar();             //se limpian los cuadruplos 
           gci.generar    ();             // Arrancar la generacion de codigo intermedio
 	}
-    
-	//--------------------------------------------------------------------------
+        //--------------------------------------------------------------------------
 
         @Override
 	public void generarCodigoObj(){
           gco.generar    ();             // Arrancar la generacion de codigo objeto
 	}
     
+	
+    
 	//--------------------------------------------------------------------------
-        
+  
         @Override
 	public void agregIUListener ( IUListener listener ) {
             iuListener = listener;
@@ -183,5 +186,6 @@ public class Compilador implements ICompilador {
             }
             return arrCuadruplos;
     }
+
     
 }
