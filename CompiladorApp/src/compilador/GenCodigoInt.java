@@ -87,7 +87,7 @@ public class GenCodigoInt {
     // Fin de analizar
     //--------------------------------------------------------------------------
    
-    //************EMPAREJAR**************//
+    //***********EMPAREJAR*************//
     private void emparejar ( String t ) {
 	if (cmp.be.preAnalisis.complex.equals ( t ) )
 		cmp.be.siguiente ();

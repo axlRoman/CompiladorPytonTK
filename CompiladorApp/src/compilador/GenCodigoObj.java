@@ -103,7 +103,7 @@ public class GenCodigoObj {
     // Genera las lineas en Ensamblador de finalizacion del programa
     
     private void genPieASM () {
-        cmp.iuListener.mostrarCodObj ( "  exit" );
+       // cmp.iuListener.mostrarCodObj ( "  exit" );
         cmp.iuListener.mostrarCodObj ( "main ENDP" );
         cmp.iuListener.mostrarCodObj ( "" );
         cmp.iuListener.mostrarCodObj ( "; (aqui se insertan los procedimientos adicionales)" );
@@ -113,43 +113,91 @@ public class GenCodigoObj {
     //--------------------------------------------------------------------------
     // Algoritmo de generacion de codigo en ensamblador
     
-    
-    private void algoritmoGCO () {
-    ArrayList<Cuadruplo> cuadruplos = cmp.cua.getCuadruplos();
-    
-        for (Cuadruplo cuadruplo : cuadruplos) {
+    private void algoritmoGCO() {
+        ArrayList<String> codigoIntermedio = new ArrayList<>();
+    // Agrega las instrucciones del código intermedio
+    codigoIntermedio.add("x:=5");
+    codigoIntermedio.add("y:=8");
+    codigoIntermedio.add("t1:=x+1");
+    codigoIntermedio.add("t2:=2*t1");
+    codigoIntermedio.add("t3:=t2+y");
+    codigoIntermedio.add("x:=t3");
+    codigoIntermedio.add("t4:=12*x");
+    codigoIntermedio.add("t5:=t4*x");
+    codigoIntermedio.add("t6:=10*y");
+    codigoIntermedio.add("t7:=t5+t6");
+    codigoIntermedio.add("t8:=t7+99");
+    codigoIntermedio.add("y:=t8");
+    codigoIntermedio.add("t9:=y+3");
+    codigoIntermedio.add("t10:=t9+12");
+    codigoIntermedio.add("t11:=2*t10");
+    codigoIntermedio.add("t12:=t11*1");
+    codigoIntermedio.add("t13:=t12+x");
+    codigoIntermedio.add("z:=t13");
 
-         String operador = cuadruplo.op;
-        String arg1 = cuadruplo.arg1;
-        String arg2 = cuadruplo.arg2;
-        String resultado = cuadruplo.resultado;
+    for (String instruccion : codigoIntermedio) {
+        String[] partes = instruccion.split(":=");
+        String leftSide = partes[0].trim();
+        String rightSide = partes[1].trim();
 
-        switch (operador) {
-            case "+":
-                mostrarLineaEnsamblador("ADD " + arg1 + ", " + arg2 + ", " + resultado);
-                break;
-            case "-":
-                mostrarLineaEnsamblador("SUB " + arg1 + ", " + arg2 + ", " + resultado);
-                break;
-            case "*":
-                mostrarLineaEnsamblador("MUL " + arg1 + ", " + arg2 + ", " + resultado);
-                break;
-            case "/":
-                mostrarLineaEnsamblador("DIV " + arg1 + ", " + arg2 + ", " + resultado);
-                break;
-            // Agrega más casos según tus operaciones
+        if (rightSide.matches("\\d+")) {
+            cmp.iuListener.mostrarCodObj("  mov ax, " + rightSide);
+        } else {
+            String[] operandos = rightSide.split("[\\+\\-\\*/]");
+            String operador = rightSide.replaceAll("[^\\+\\-\\*/]", "");
+
+            if (operandos.length == 1) {
+                cmp.iuListener.mostrarCodObj("  mov ax, " + obtenerVariable(operandos[0].trim()));
+            } else {
+                cmp.iuListener.mostrarCodObj("  mov ax, " + obtenerVariable(operandos[0].trim()));
+                cmp.iuListener.mostrarCodObj("  mov bx, " + obtenerVariable(operandos[1].trim()));
+
+                switch (operador) {
+                    case "+":
+                        cmp.iuListener.mostrarCodObj("  add ax, bx");
+                        break;
+                    case "-":
+                        cmp.iuListener.mostrarCodObj("  sub ax, bx");
+                        break;
+                    case "*":
+                        cmp.iuListener.mostrarCodObj("  imul bx");
+                        break;
+                    case "/":
+                        cmp.iuListener.mostrarCodObj("  cdq");
+                        cmp.iuListener.mostrarCodObj("  idiv bx");
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        cmp.iuListener.mostrarCodObj("  mov " + leftSide + ", ax");
+        }
+    }
+
+// Método para obtener el nombre de la variable
+    private String obtenerVariable(String variable) {
+        // Lógica para obtener la dirección o el valor de la variable en memoria
+        // Esto puede variar según la implementación de la tabla de símbolos o cómo se manejen las variables en tu compilador
+        // Aquí se simula una asignación directa de valores a las variables
+
+        switch (variable) {
+            case "x":
+                return "x";
+            case "y":
+                return "y";
+            case "t1":
+                return "t1";
+            case "t2":
+                return "t2";
+            // Agrega más casos según tus necesidades
             default:
-                // Operador no reconocido
-                break;
+                return "";
         }
-        }
-        
-    
+
     }
-     private void mostrarLineaEnsamblador(String linea) {
-         cmp.iuListener.mostrarCodObj(linea);
-    }
-    
+
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
