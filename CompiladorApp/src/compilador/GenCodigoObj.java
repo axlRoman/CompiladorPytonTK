@@ -68,9 +68,11 @@ public class GenCodigoObj {
         cmp.iuListener.mostrarCodObj ( "" );
         cmp.iuListener.mostrarCodObj ( "; INCLUDE Irvine32.inc" );
         cmp.iuListener.mostrarCodObj ( "; (aqui se insertan las definiciones de simbolos)" );
-        cmp.iuListener.mostrarCodObj ( "" );
+        cmp.iuListener.mostrarCodObj ( ".MODEL SMALL" );
+        cmp.iuListener.mostrarCodObj ( ".STACK 4096h" );
         cmp.iuListener.mostrarCodObj ( ".data" );
-        cmp.iuListener.mostrarCodObj ( "  ; (aqui se insertan las variables)" );        
+        cmp.iuListener.mostrarCodObj ( "  ; (aqui se insertan las variables)" );       
+        
     }
     
     //--------------------------------------------------------------------------
@@ -86,9 +88,25 @@ public class GenCodigoObj {
             
             // Genera una declaracion de variable solo si se trata de un id
             if ( elemento.getComplex().equals ( "id" ) ) 
-                cmp.iuListener.mostrarCodObj ( "  " + variable + " DWORD 0" );
+                cmp.iuListener.mostrarCodObj ( "  " + variable + " DW 0" );
         }
         cmp.iuListener.mostrarCodObj ( "" );
+        
+        
+        ArrayList<Cuadruplo> cuadruplos = cmp.cua.getCuadruplos(); // Suponiendo que getCuadruplos() devuelve los cuádruplos
+
+    for (Cuadruplo cuadruplo : cuadruplos) {
+        String operando1 = cuadruplo.arg1;
+        String operando2 = cuadruplo.arg2;
+        if(operando1.charAt(0)=='t')
+            cmp.iuListener.mostrarCodObj("  "+operando1+ " DW 0");
+        if(!operando2.isEmpty())
+            if(operando2.charAt(0)=='t')
+                cmp.iuListener.mostrarCodObj("  "+operando2+ " DW 0");
+
+    }
+        
+        
     }
     
     //--------------------------------------------------------------------------
@@ -97,6 +115,10 @@ public class GenCodigoObj {
         cmp.iuListener.mostrarCodObj ( ".code" );
         cmp.iuListener.mostrarCodObj ( "main PROC" );
         cmp.iuListener.mostrarCodObj ( "  ; (aqui se insertan las instrucciones ejecutables)" );
+        cmp.iuListener.mostrarCodObj ( "inicio:\n" +
+"MOV ax, @Data \n" +
+"MOV ds, ax" );
+        //cmp.iuListener.mostrarCodObj ( "" );
     }
     
     //--------------------------------------------------------------------------
@@ -104,6 +126,8 @@ public class GenCodigoObj {
     
     private void genPieASM () {
        // cmp.iuListener.mostrarCodObj ( "  exit" );
+        cmp.iuListener.mostrarCodObj ( "MOV ax,4c00h\n" +
+"INT 21h" );
         cmp.iuListener.mostrarCodObj ( "main ENDP" );
         cmp.iuListener.mostrarCodObj ( "" );
         cmp.iuListener.mostrarCodObj ( "; (aqui se insertan los procedimientos adicionales)" );
@@ -134,63 +158,52 @@ public class GenCodigoObj {
             case "/":
                 generarDivision(operando1, operando2, resultado);
                 break;
+            case "=":
+                generarIgual(operando1, resultado);
+                break;
             // Agrega más casos según las operaciones que manejes en tus cuádruplos
             default:
                 break;
         }
     }
 }
-
+    
 private void generarSuma(String operando1, String operando2, String resultado) {
     cmp.iuListener.mostrarCodObj("  ; Suma");
-    cmp.iuListener.mostrarCodObj("  mov ax, " + obtenerVariable(operando1));
-    cmp.iuListener.mostrarCodObj("  add ax, " + obtenerVariable(operando2));
+    cmp.iuListener.mostrarCodObj("  mov ax, " + operando1);
+    cmp.iuListener.mostrarCodObj("  add ax, " + (operando2));
     cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
 }
 
 private void generarResta(String operando1, String operando2, String resultado) {
     cmp.iuListener.mostrarCodObj("  ; Resta");
-    cmp.iuListener.mostrarCodObj("  mov ax, " + obtenerVariable(operando1));
-    cmp.iuListener.mostrarCodObj("  sub ax, " + obtenerVariable(operando2));
+    cmp.iuListener.mostrarCodObj("  mov ax, " + (operando1));
+    cmp.iuListener.mostrarCodObj("  sub ax, " + (operando2));
     cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
 }
 
 private void generarMultiplicacion(String operando1, String operando2, String resultado) {
-    cmp.iuListener.mostrarCodObj("  ; Multiplicación");
-    cmp.iuListener.mostrarCodObj("  mov ax, " + obtenerVariable(operando1));
-    cmp.iuListener.mostrarCodObj("  imul " + obtenerVariable(operando2));
+    cmp.iuListener.mostrarCodObj("  ; Multiplicacion");
+    cmp.iuListener.mostrarCodObj("  mov ax, " + (operando1));
+    cmp.iuListener.mostrarCodObj("  mov bx, " + (operando2));
+    cmp.iuListener.mostrarCodObj("  mul bx");
     cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
 }
 
 private void generarDivision(String operando1, String operando2, String resultado) {
     cmp.iuListener.mostrarCodObj("  ; División");
-    cmp.iuListener.mostrarCodObj("  mov ax, " + obtenerVariable(operando1));
+    cmp.iuListener.mostrarCodObj("  mov ax, " + (operando1));
     cmp.iuListener.mostrarCodObj("  cwd");
-    cmp.iuListener.mostrarCodObj("  idiv " + obtenerVariable(operando2));
+    cmp.iuListener.mostrarCodObj("  div " + (operando2));
+    cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
+}
+private void generarIgual(String operando1, String resultado) {
+    cmp.iuListener.mostrarCodObj("  ; igualacion");
+    cmp.iuListener.mostrarCodObj("  mov ax, " + (operando1));
     cmp.iuListener.mostrarCodObj("  mov " + resultado + ", ax");
 }
 
-// Método para obtener el nombre de la variable
-    private String obtenerVariable(String variable) {
-        // Lógica para obtener la dirección o el valor de la variable en memoria
-        // Esto puede variar según la implementación de la tabla de símbolos o cómo se manejen las variables en tu compilador
-        // Aquí se simula una asignación directa de valores a las variables
 
-        switch (variable) {
-            case "x":
-                return "x";
-            case "y":
-                return "y";
-            case "t1":
-                return "t1";
-            case "t2":
-                return "t2";
-            // Agrega más casos según tus necesidades
-            default:
-                return "";
-        }
-
-    }
 
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
